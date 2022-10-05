@@ -51,8 +51,6 @@ else:
         json.dump(data, f, ensure_ascii=False, indent=4)
     name = name = data['client']['deviceName']
     f.close()
-    print(Fore.RED + "RESTART CLIENT FOR NAME TO BE RECOGNIZED!!!!")
-    print(Style.RESET_ALL)
     # todo figure out why the client needs to be restarted when name is assigned
 #########################################################################
 print(f"Connected as: {name}")
