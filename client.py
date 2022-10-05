@@ -64,6 +64,7 @@ def useInput():
         smsg = input("enter msg (q to close): ")
         if smsg == 'q':
             print("Disconecting...")
+            send_msg("close")
             time.sleep(1)
             wsapp.close()
             connected = False
