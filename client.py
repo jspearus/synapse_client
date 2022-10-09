@@ -28,6 +28,7 @@ def on_message(wsapp, message):
     msg = json.loads(message)
     if msg['destination'] == name or msg['destination'] == "all":
         print(f"Rec: {message}")
+        print("enter DEST (q to close): ")
 
 
 wsapp = websocket.WebSocketApp("ws://synapse.viewdns.net:8000/ws/test/?",
