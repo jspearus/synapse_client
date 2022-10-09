@@ -15,9 +15,10 @@ connected = True
 name = ''
 
 
-def send_msg(mssg):
+def send_msg(mssg, dest):
     msg = {'message': mssg,
-           'username': name, 'destination': 'server'}
+           'username': name, 
+           'destination': dest}
     jmsg = json.dumps(msg)
     wsapp.send(jmsg)
     print(f"Sent: {msg}")
@@ -59,19 +60,29 @@ print(f"Connected as: {name}")
 def useInput():
     global connected
     time.sleep(2)
-    send_msg("connected")
+    dest = ""
+    send_msg("connected", dest)
     while connected:
-        smsg = input("enter msg (q to close): ")
-        if smsg == 'q':
+        dest = input("enter DEST (q to close): ")
+        if dest == 'q':
             print("Disconecting...")
-            send_msg("close")
+            send_msg("close", dest)
             time.sleep(1)
             wsapp.close()
             connected = False
             print("Closed...")
         else:
-            send_msg(smsg)
-            time.sleep(.3)
+            smsg = input("enter msg (q to close): ")
+            if smsg == 'q':
+                print("Disconecting...")
+                send_msg("close", dest)
+                time.sleep(1)
+                wsapp.close()
+                connected = False
+                print("Closed...")
+            else:
+                send_msg(smsg, dest)
+                time.sleep(.3)
 
 
 inputThead = threading.Thread(target=useInput, args=())
