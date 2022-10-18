@@ -27,7 +27,6 @@ def send_msg(mssg, dest):
 def on_message(wsapp, message):
     msg = json.loads(message)
     if msg['destination'] == name or msg['destination'] == "all":
-        print(f"Rec: {message}")
         print(f"msg: {msg['message']}")
         print("enter DEST (q to close): ")
 
