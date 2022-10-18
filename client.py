@@ -17,7 +17,7 @@ name = ''
 
 def send_msg(mssg, dest):
     msg = {'message': mssg,
-           'username': name, 
+           'username': name,
            'destination': dest}
     jmsg = json.dumps(msg)
     wsapp.send(jmsg)
@@ -29,6 +29,27 @@ def on_message(wsapp, message):
     if msg['destination'] == name or msg['destination'] == "all":
         print(f"Rec: {message}")
         print("enter DEST (q to close): ")
+
+        if msg['message'] == 'Halloween':
+
+            os.system(
+                "gsettings set org.gnome.desktop.background picture-uri file:////home/jeff/Pictures/halloween.jpg")
+
+        elif msg['message'] == 'Thanksgiving':
+            os.system(
+                "gsettings set org.gnome.desktop.background picture-uri file:////home/jeff/Pictures/thanksgiving.jpg")
+
+        elif msg['message'] == 'Christmas Day':
+            os.system(
+                "gsettings set org.gnome.desktop.background picture-uri file:////home/jeff/Pictures/christmas.jpg")
+
+        elif msg['message'] == "New Year's Day":
+            os.system(
+                "gsettings set org.gnome.desktop.background picture-uri file:////home/jeff/Pictures/newyear.jpg")
+        elif msg['message'] == "snow":
+            file = "/home/jeff/Videos/snow.mp4"
+            os.system("mplayer -fs  " + file)
+            # os.system("sudo amixer cset numid=3 0%")
 
 
 wsapp = websocket.WebSocketApp("ws://synapse.viewdns.net:8000/ws/test/?",
