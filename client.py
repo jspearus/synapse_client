@@ -31,20 +31,20 @@ def on_message(wsapp, message):
         print(f"msg: {msg['message']}")
         print("enter DEST (q to close): ")
 
-        if (msg['message'].lower()) == 'Halloween':
+        if msg['message'] == 'Halloween':
             print("good")
             os.system(
                 "gsettings set org.gnome.desktop.background picture-uri file:////home/jeff/Pictures/halloween.jpg")
 
-        elif msg['message'].lower() == 'Thanksgiving':
+        elif msg['message'] == 'Thanksgiving':
             os.system(
                 "gsettings set org.gnome.desktop.background picture-uri file:////home/jeff/Pictures/thanksgiving.jpg")
 
-        elif msg['message'].lower() == 'Christmas Day':
+        elif msg['message'] == 'Christmas Day':
             os.system(
                 "gsettings set org.gnome.desktop.background picture-uri file:////home/jeff/Pictures/christmas.jpg")
 
-        elif msg['message'].lower() == "New Year's Day":
+        elif msg['message'] == "New Year's Day":
             os.system(
                 "gsettings set org.gnome.desktop.background picture-uri file:////home/jeff/Pictures/newyear.jpg")
             
@@ -94,6 +94,7 @@ def useInput():
     time.sleep(2)
     dest = ""
     send_msg("connected", dest)
+    send_msg("holiday", name)
     while connected:
         dest = input("enter DEST (q to close): ")
         if dest == 'q':
