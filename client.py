@@ -31,7 +31,6 @@ def on_message(wsapp, message):
         print("enter DEST (q to close): ")
 
         if msg['message'] == 'Halloween':
-            print("good")
             os.system(
                 "gsettings set org.gnome.desktop.background picture-uri file:////home/jeff/Pictures/halloween.jpg")
 
