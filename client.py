@@ -21,7 +21,7 @@ def send_msg(mssg, dest):
            'destination': dest}
     jmsg = json.dumps(msg)
     wsapp.send(jmsg)
-    print(f"Sent: {msg}")
+    # print(f"Sent: {msg}")
 
 
 def on_message(wsapp, message):
