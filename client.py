@@ -28,10 +28,11 @@ def on_message(wsapp, message):
     msg = json.loads(message)
     if msg['destination'] == name or msg['destination'] == "all":
         print(f"Rec: {message}")
+        print(f"msg: {msg['message']}")
         print("enter DEST (q to close): ")
 
         if msg['message'] == 'Halloween':
-
+            print("good")
             os.system(
                 "gsettings set org.gnome.desktop.background picture-uri file:////home/jeff/Pictures/halloween.jpg")
 
