@@ -31,26 +31,35 @@ def on_message(wsapp, message):
         print(f"msg: {msg['message']}")
         print("enter DEST (q to close): ")
 
-        if msg['message'] == 'Halloween':
+        if (msg['message'].lower()) == 'Halloween':
             print("good")
             os.system(
                 "gsettings set org.gnome.desktop.background picture-uri file:////home/jeff/Pictures/halloween.jpg")
 
-        elif msg['message'] == 'Thanksgiving':
+        elif msg['message'].lower() == 'Thanksgiving':
             os.system(
                 "gsettings set org.gnome.desktop.background picture-uri file:////home/jeff/Pictures/thanksgiving.jpg")
 
-        elif msg['message'] == 'Christmas Day':
+        elif msg['message'].lower() == 'Christmas Day':
             os.system(
                 "gsettings set org.gnome.desktop.background picture-uri file:////home/jeff/Pictures/christmas.jpg")
 
-        elif msg['message'] == "New Year's Day":
+        elif msg['message'].lower() == "New Year's Day":
             os.system(
                 "gsettings set org.gnome.desktop.background picture-uri file:////home/jeff/Pictures/newyear.jpg")
-        elif msg['message'] == "snow":
+            
+        elif msg['message'].lower() == "snow":
             file = "/home/jeff/Videos/snow.mp4"
             os.system("mplayer -fs  " + file)
             # os.system("sudo amixer cset numid=3 0%")
+        
+        elif msg['message'].lower() == "rain":
+            file = "/home/jeff/Videos/rain.mp4"
+            os.system("mplayer -fs  " + file)
+            
+        elif msg['message'].lower() == "fog":
+            file = "/home/jeff/Videos/fog.mp4"
+            os.system("mplayer -fs  " + file)
 
 
 wsapp = websocket.WebSocketApp("ws://synapse.viewdns.net:8000/ws/test/?",
