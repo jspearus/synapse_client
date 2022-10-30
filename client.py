@@ -36,6 +36,20 @@ def on_close(wsapp):
     connect_websocket() # retry per 10 seconds
 
 
+def on_open(wsapp):
+    print(f"Connected as: {name}")
+    inputThead = threading.Thread(target=useInput, args=())
+    inputThead.setDaemon(True)
+    inputThead.start()
+
+
+def on_close(wsapp):
+    # print('disconnected from server')
+    print("Retry : %s" % time.ctime())
+    time.sleep(10)
+    connect_websocket()  # retry per 10 seconds
+
+
 def on_message(wsapp, message):
     msg = json.loads(message)
     if msg['destination'] == name or msg['destination'] == "all":
@@ -70,22 +84,14 @@ def on_message(wsapp, message):
             file = "/home/jeff/Videos/fog.mp4"
             os.system("mplayer -fs  " + file)
 
-def connect_websocket():
-    global wsapp
-    wsapp =  websocket.WebSocketApp("ws://synapse.viewdns.net:8000/ws/test/?",
-                                header={
-                                    "username": name,
-                                    "message": "connected",
-                                    "destination": "server"
-                                },
-                                on_message=on_message,
-                                on_close=on_close,
-                                on_open=on_open,)                          
-    wst = threading.Thread(target=wsapp.run_forever())
-    wst.daemon = True
-    wst.start()
-    
 
+wsapp = websocket.WebSocketApp("ws://synapse.viewdns.net:8000/ws/test/?",
+                               header={
+                                   "username": name,
+                                   "message": "connected",
+                                   "destination": "server"
+                               },
+                               on_message=on_message)
 
 
 # todo EDIT NAME.TXT TO THE NAME OF DEVICE
@@ -103,7 +109,7 @@ else:
     f.close()
     # todo figure out why the client needs to be restarted when name is assigned
 #########################################################################
-
+print(f"Connected as: {name}")
 
 
 def useInput():
@@ -135,11 +141,8 @@ def useInput():
                 time.sleep(.3)
 
 
+inputThead = threading.Thread(target=useInput, args=())
+inputThead.setDaemon(True)
+inputThead.start()
 
-
-if __name__ == "__main__":
-    try:
-        connect_websocket()
-    except Exception as err:
-        print(err)
-        print("connect failed")
+wsapp.run_forever()
