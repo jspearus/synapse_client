@@ -22,19 +22,6 @@ def send_msg(mssg, dest):
     jmsg = json.dumps(msg)
     wsapp.send(jmsg)
     # print(f"Sent: {msg}")
-    
-def on_open(wsapp):
-    print(f"Connected as: {name}")
-    inputThead = threading.Thread(target=useInput, args=())
-    inputThead.setDaemon(True)
-    inputThead.start()
-    
-def on_close(wsapp):
-    # print('disconnected from server')
-    print("Retry : %s" % time.ctime())
-    time.sleep(10)
-    connect_websocket() # retry per 10 seconds
-
 
 def on_open(wsapp):
     print(f"Connected as: {name} @ {time.ctime()}")
