@@ -21,7 +21,7 @@ def send_msg(mssg, dest):
            'destination': dest}
     jmsg = json.dumps(msg)
     wsapp.send(jmsg)
-    print(f"Sent: {msg}")
+    # print(f"Sent: {msg}")
 
 
 def on_open(wsapp):
@@ -41,12 +41,10 @@ def on_close(wsapp):
 def on_message(wsapp, message):
     msg = json.loads(message)
     if msg['destination'] == name or msg['destination'] == "all":
-        print(f"Rec: {message}")
         print(f"msg: {msg['message']}")
         print("enter DEST (q to close): ")
 
         if msg['message'] == 'Halloween':
-            print("good")
             os.system(
                 "gsettings set org.gnome.desktop.background picture-uri file:////home/jeff/Pictures/halloween.jpg")
 
@@ -61,10 +59,19 @@ def on_message(wsapp, message):
         elif msg['message'] == "New Year's Day":
             os.system(
                 "gsettings set org.gnome.desktop.background picture-uri file:////home/jeff/Pictures/newyear.jpg")
-        elif msg['message'] == "snow":
+            
+        elif msg['message'].lower() == "snow":
             file = "/home/jeff/Videos/snow.mp4"
             os.system("mplayer -fs  " + file)
             # os.system("sudo amixer cset numid=3 0%")
+        
+        elif msg['message'].lower() == "rain":
+            file = "/home/jeff/Videos/rain.mp4"
+            os.system("mplayer -fs  " + file)
+            
+        elif msg['message'].lower() == "fog":
+            file = "/home/jeff/Videos/fog.mp4"
+            os.system("mplayer -fs  " + file)
 
 
 def connect_websocket():
@@ -105,6 +112,7 @@ def useInput():
     time.sleep(2)
     dest = ""
     send_msg("connected", dest)
+    send_msg("holiday", name)
     while connected:
         dest = input("enter DEST (q to close): ")
         if dest == 'q':
