@@ -36,7 +36,7 @@ def on_close(wsapp):
     print('disconnected from server')
     print("Retry : %s" % time.ctime())
     time.sleep(10)
-    connect_websocket()  # retry per 10 seconds
+    __create_ws()  # retry per 10 seconds
 
 
 def on_message(wsapp, message):
@@ -62,22 +62,22 @@ def connect_websocket():
     wst.start()
 
 
-def __create_ws(self):
+def __create_ws():
+    global wsapp
     while True:
         try:
             websocket.enableTrace(False)
-            self.__WSCONNECTION = websocket.WebSocketApp(url,
-                                                         on_message=self.__on_message,
-                                                         on_error=self.__on_error,
-                                                         on_close=self.__on_close,
-                                                         header=self.header)
-            self.__WSCONNECTION.on_open = self.__on_open
-            self.__WSCONNECTION.run_forever(
+            wsapp= websocket.WebSocketApp("ws://synapse.viewdns.net:8000/ws/test/?",
+                                                         on_message=on_message,
+                                                        #  on_error=self.__on_error,
+                                                         on_close=on_close,
+                                                         )
+            wsapp.on_open =on_open
+            wsapp.run_forever(
                 skip_utf8_validation=True, ping_interval=10, ping_timeout=8)
         except Exception as e:
-            gc.collect()
-            log.debug("Websocket connection Error  : {0}".format(e))
-        log.debug("Reconnecting websocket  after 5 sec")
+            print("Websocket connection Error  : {0}".format(e))
+        print("Reconnecting websocket  after 5 sec")
         time.sleep(5)
 
 
@@ -128,7 +128,7 @@ def useInput():
 
 if __name__ == "__main__":
     try:
-        connect_websocket()
+        __create_ws()
     except Exception as err:
         print(err)
         print("connect failed")
