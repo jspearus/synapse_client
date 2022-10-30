@@ -1,8 +1,7 @@
 import websocket
 import json
-import threading
+import threading, time
 import sys
-import time
 import sched
 import datetime
 import os
@@ -16,12 +15,25 @@ name = ''
 
 
 def send_msg(mssg, dest):
+    global wsapp
     msg = {'message': mssg,
            'username': name,
            'destination': dest}
     jmsg = json.dumps(msg)
     wsapp.send(jmsg)
     # print(f"Sent: {msg}")
+    
+def on_open(wsapp):
+    print(f"Connected as: {name}")
+    inputThead = threading.Thread(target=useInput, args=())
+    inputThead.setDaemon(True)
+    inputThead.start()
+    
+def on_close(wsapp):
+    # print('disconnected from server')
+    print("Retry : %s" % time.ctime())
+    time.sleep(10)
+    connect_websocket() # retry per 10 seconds
 
 
 def on_message(wsapp, message):
@@ -49,7 +61,6 @@ def on_message(wsapp, message):
         elif msg['message'].lower() == "snow":
             file = "/home/jeff/Videos/snow.mp4"
             os.system("mplayer -fs  " + file)
-            # os.system("sudo amixer cset numid=3 0%")
         
         elif msg['message'].lower() == "rain":
             file = "/home/jeff/Videos/rain.mp4"
@@ -59,14 +70,22 @@ def on_message(wsapp, message):
             file = "/home/jeff/Videos/fog.mp4"
             os.system("mplayer -fs  " + file)
 
+def connect_websocket():
+    global wsapp
+    wsapp =  websocket.WebSocketApp("ws://synapse.viewdns.net:8000/ws/test/?",
+                                header={
+                                    "username": name,
+                                    "message": "connected",
+                                    "destination": "server"
+                                },
+                                on_message=on_message,
+                                on_close=on_close,
+                                on_open=on_open,)                          
+    wst = threading.Thread(target=wsapp.run_forever())
+    wst.daemon = True
+    wst.start()
+    
 
-wsapp = websocket.WebSocketApp("ws://synapse.viewdns.net:8000/ws/test/?",
-                               header={
-                                   "username": name,
-                                   "message": "connected",
-                                   "destination": "server"
-                               },
-                               on_message=on_message)
 
 
 # todo EDIT NAME.TXT TO THE NAME OF DEVICE
@@ -84,7 +103,7 @@ else:
     f.close()
     # todo figure out why the client needs to be restarted when name is assigned
 #########################################################################
-print(f"Connected as: {name}")
+
 
 
 def useInput():
@@ -116,8 +135,11 @@ def useInput():
                 time.sleep(.3)
 
 
-inputThead = threading.Thread(target=useInput, args=())
-inputThead.setDaemon(True)
-inputThead.start()
 
-wsapp.run_forever()
+
+if __name__ == "__main__":
+    try:
+        connect_websocket()
+    except Exception as err:
+        print(err)
+        print("connect failed")
