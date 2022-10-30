@@ -32,7 +32,7 @@ def on_open(wsapp):
     inputThead.start()
 
 
-def on_close(wsapp):
+def on_close(wsapp, close_status_code, close_msg):
     print('disconnected from server')
     print("Retry : %s" % time.ctime())
     time.sleep(10)
