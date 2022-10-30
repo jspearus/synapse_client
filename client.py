@@ -49,13 +49,36 @@ def on_message(wsapp, message):
 def connect_websocket():
     global wsapp
     wsapp = websocket.WebSocketApp("ws://synapse.viewdns.net:8000/ws/test/?",
-
+                                   header={
+                                       "username": name,
+                                       "message": "connected",
+                                       "destination": " "
+                                   },
                                    on_message=on_message,
                                    on_close=on_close,
                                    on_open=on_open,)
     wst = threading.Thread(target=wsapp.run_forever())
     wst.daemon = True
     wst.start()
+
+
+def __create_ws(self):
+    while True:
+        try:
+            websocket.enableTrace(False)
+            self.__WSCONNECTION = websocket.WebSocketApp(url,
+                                                         on_message=self.__on_message,
+                                                         on_error=self.__on_error,
+                                                         on_close=self.__on_close,
+                                                         header=self.header)
+            self.__WSCONNECTION.on_open = self.__on_open
+            self.__WSCONNECTION.run_forever(
+                skip_utf8_validation=True, ping_interval=10, ping_timeout=8)
+        except Exception as e:
+            gc.collect()
+            log.debug("Websocket connection Error  : {0}".format(e))
+        log.debug("Reconnecting websocket  after 5 sec")
+        time.sleep(5)
 
 
 # todo EDIT NAME.TXT TO THE NAME OF DEVICE
