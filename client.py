@@ -39,6 +39,10 @@ def on_close(wsapp, close_status_code, close_msg):
     __create_ws()  # retry per 10 seconds
 
 
+def on_error(wsapp, error):
+    print(error)
+
+
 def on_message(wsapp, message):
     msg = json.loads(message)
     if msg['destination'] == name or msg['destination'] == "all":
@@ -59,7 +63,7 @@ def __create_ws():
                                                "destination": " "
                                            },
                                            on_message=on_message,
-                                           #  on_error=self.__on_error,
+                                           on_error=on_error,
                                            on_close=on_close,
                                            )
             wsapp.on_open = on_open
