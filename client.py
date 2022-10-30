@@ -34,7 +34,7 @@ def on_close(wsapp):
     # print('disconnected from server')
     print("Retry : %s" % time.ctime())
     time.sleep(10)
-    connect_websocket()  # retry per 10 seconds
+    __create_w()  # retry per 10 seconds
 
 
 def on_message(wsapp, message):
@@ -72,21 +72,28 @@ def on_message(wsapp, message):
             os.system("mplayer -fs  " + file)
 
 
-def connect_websocket():
+def __create_ws():
     global wsapp
-    wsapp = websocket.WebSocketApp("ws://synapse.viewdns.net:8000/ws/test/?",
-                                   header={
-                                       "username": name,
-                                       "message": "connected",
-                                       "destination": " "
-                                   },
-                                   on_message=on_message,
-                                   on_close=on_close,
-                                   on_open=on_open,)
-    wst = threading.Thread(target=wsapp.run_forever())
-    wst.daemon = True
-    wst.start()
-
+    while True:
+        try:
+            websocket.enableTrace(False)
+            wsapp = websocket.WebSocketApp("ws://synapse.viewdns.net:8000/ws/test/?",
+                                           header={
+                                               "username": name,
+                                               "message": "connected",
+                                               "destination": " "
+                                           },
+                                           on_message=on_message,
+                                           #  on_error=self.__on_error,
+                                           on_close=on_close,
+                                           )
+            wsapp.on_open = on_open
+            wsapp.run_forever(
+                skip_utf8_validation=True, ping_interval=10, ping_timeout=8)
+        except Exception as e:
+            print("Websocket connection Error  : {0}".format(e))
+        print("Reconnecting websocket  after 10 sec")
+        time.sleep(10)
 
 # todo EDIT NAME.TXT TO THE NAME OF DEVICE
 f = Path('name.json')
@@ -137,7 +144,7 @@ def useInput():
 
 if __name__ == "__main__":
     try:
-        connect_websocket()
+        __create_w()
     except Exception as err:
         print(err)
         print("connect failed")
