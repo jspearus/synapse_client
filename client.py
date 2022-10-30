@@ -35,6 +35,9 @@ def on_close(wsapp):
     print("Retry : %s" % time.ctime())
     time.sleep(10)
     __create_ws()  # retry per 10 seconds
+    
+def on_error(wsapp, error):
+    print(error)
 
 
 def on_message(wsapp, message):
@@ -84,7 +87,7 @@ def __create_ws():
                                                "destination": " "
                                            },
                                            on_message=on_message,
-                                           #  on_error=self.__on_error,
+                                            on_error=on_error,
                                            on_close=on_close,
                                            )
             wsapp.on_open = on_open
