@@ -77,7 +77,7 @@ def on_message(wsapp, message):
 
 def __create_ws():
     global wsapp
-    while True:
+    while connected:
         try:
             websocket.enableTrace(False)
             wsapp = websocket.WebSocketApp("ws://synapse.viewdns.net:8000/ws/test/?",
