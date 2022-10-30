@@ -77,6 +77,7 @@ def on_message(wsapp, message):
 
 def __create_ws():
     global wsapp
+    global connected
     while connected:
         try:
             websocket.enableTrace(False)
