@@ -34,7 +34,7 @@ def on_close(wsapp):
     # print('disconnected from server')
     print("Retry : %s" % time.ctime())
     time.sleep(10)
-    __create_w()  # retry per 10 seconds
+    __create_ws()  # retry per 10 seconds
 
 
 def on_message(wsapp, message):
@@ -144,7 +144,7 @@ def useInput():
 
 if __name__ == "__main__":
     try:
-        __create_w()
+        __create_ws()
     except Exception as err:
         print(err)
         print("connect failed")
