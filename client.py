@@ -37,7 +37,7 @@ def on_close(wsapp):
 
 
 def on_open(wsapp):
-    print(f"Connected as: {name}")
+    print(f"Connected as: {name} @ {time.ctime()}")
     inputThead = threading.Thread(target=useInput, args=())
     inputThead.setDaemon(True)
     inputThead.start()
@@ -85,13 +85,20 @@ def on_message(wsapp, message):
             os.system("mplayer -fs  " + file)
 
 
-wsapp = websocket.WebSocketApp("ws://synapse.viewdns.net:8000/ws/test/?",
-                               header={
-                                   "username": name,
-                                   "message": "connected",
-                                   "destination": "server"
-                               },
-                               on_message=on_message)
+def connect_websocket():
+    global wsapp
+    wsapp = websocket.WebSocketApp("ws://synapse.viewdns.net:8000/ws/test/?",
+                                   header={
+                                       "username": name,
+                                       "message": "connected",
+                                       "destination": " "
+                                   },
+                                   on_message=on_message,
+                                   on_close=on_close,
+                                   on_open=on_open,)
+    wst = threading.Thread(target=wsapp.run_forever())
+    wst.daemon = True
+    wst.start()
 
 
 # todo EDIT NAME.TXT TO THE NAME OF DEVICE
@@ -109,7 +116,7 @@ else:
     f.close()
     # todo figure out why the client needs to be restarted when name is assigned
 #########################################################################
-print(f"Connected as: {name}")
+
 
 
 def useInput():
@@ -141,8 +148,9 @@ def useInput():
                 time.sleep(.3)
 
 
-inputThead = threading.Thread(target=useInput, args=())
-inputThead.setDaemon(True)
-inputThead.start()
-
-wsapp.run_forever()
+if __name__ == "__main__":
+    try:
+        connect_websocket()
+    except Exception as err:
+        print(err)
+        print("connect failed")
