@@ -4,15 +4,66 @@ import threading
 import sys
 import time
 import sched
-import datetime
+from datetime import datetime
 import os
 import json
 from pathlib import Path
 import platform
 from colorama import Fore, Back, Style
+from numpy import random
+from tkinter import *
+
+from general import runTree, runtest1, runInit, runCloak, runLoad
 
 connected = True
 name = ''
+auto_mode = False
+mode = "none"
+today = datetime.now()
+
+root = Tk()
+
+##############################  COMMAND FUNCTIONS ##################################
+
+
+def init():
+    file = "/home/pi/Videos/bootup.mp4"
+    # runtest1()
+    os.system("vlc  " + file)
+
+
+def killswitch():
+    file = "/home/pi/Music/012SystemImpared.mp3"
+    os.system("pcmanfm --set-wallpaper /home/pi/Pictures/base.jpg")
+    # runLoad()
+    os.system("vlc  " + file)
+    send_msg("close", dest)
+    time.sleep(1)
+    connected = False
+    # root.destroy()
+
+
+def mute():
+    file = "/home/pi/Music/the_division_pulse.mp3"
+    # runCloak()
+    os.system("vlc  " + file)
+    os.system("sudo amixer cset numid=3 0%")
+
+
+def loud():
+    os.system("sudo amixer cset numid=3 100%")
+    file = "/home/pi/Music/division_completed.mp3"
+    # runLoad()
+    os.system("vlc  " + file)
+
+
+def med():
+    os.system("sudo amixer cset numid=3 50%")
+    file = "/home/pi/Music/division_completed.mp3"
+    # runLoad()
+    os.system("vlc  " + file)
+
+#######################################################################################
 
 
 def send_msg(mssg, dest):
