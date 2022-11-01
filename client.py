@@ -96,7 +96,8 @@ def __create_ws():
                 skip_utf8_validation=True, ping_interval=10, ping_timeout=8)
         except Exception as e:
             print("Websocket connection Error  : {0}".format(e))
-        print("Reconnecting websocket  after 10 sec")
+        if connected:
+            print("Reconnecting websocket  after 10 sec")
         time.sleep(10)
 
 # todo EDIT NAME.TXT TO THE NAME OF DEVICE
@@ -131,7 +132,7 @@ def useInput():
             time.sleep(1)
             wsapp.close()
             connected = False
-            print("Closed...")
+            print("Closing...")
         else:
             smsg = input("enter msg (q to close): ")
             if smsg == 'q':
@@ -140,7 +141,7 @@ def useInput():
                 time.sleep(1)
                 wsapp.close()
                 connected = False
-                print("Closed...")
+                print("Closing...")
             else:
                 send_msg(smsg, dest)
                 time.sleep(.3)
