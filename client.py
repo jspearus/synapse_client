@@ -33,10 +33,12 @@ def on_open(wsapp):
 
 
 def on_close(wsapp, close_status_code, close_msg):
+    global connected
     print('disconnected from server')
-    print("Retry : %s" % time.ctime())
-    time.sleep(10)
-    __create_ws()  # retry per 10 seconds
+    if connected:
+        print("Retry : %s" % time.ctime())
+        time.sleep(10)
+        __create_ws()  # retry per 10 seconds
 
 
 def on_error(wsapp, error):
@@ -105,7 +107,7 @@ def useInput():
             time.sleep(1)
             wsapp.close()
             connected = False
-            print("Closed...")
+            print("Closing...")
         else:
             smsg = input("enter msg (q to close): ")
             if smsg == 'q':
@@ -114,7 +116,7 @@ def useInput():
                 time.sleep(1)
                 wsapp.close()
                 connected = False
-                print("Closed...")
+                print("Closing...")
             else:
                 send_msg(smsg, dest)
                 time.sleep(.3)
