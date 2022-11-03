@@ -31,10 +31,12 @@ def on_open(wsapp):
 
 
 def on_close(wsapp, close_status_code, close_msg):
+    global connected
     # print('disconnected from server')
-    print("Retry : %s" % time.ctime())
-    time.sleep(10)
-    __create_ws()  # retry per 10 seconds
+    if connected:
+        print("Retry : %s" % time.ctime())
+        time.sleep(10)
+        __create_ws()  # retry per 10 seconds
     
 def on_error(wsapp, error):
     print(error)
@@ -46,33 +48,44 @@ def on_message(wsapp, message):
         print(f"msg: {msg['message']}")
         print("enter DEST (q to close): ")
 
-        if msg['message'] == 'Halloween':
+        if msg['message'] == 'halloween':
             os.system(
                 "gsettings set org.gnome.desktop.background picture-uri file:////home/jeff/Pictures/halloween.jpg")
 
-        elif msg['message'] == 'Thanksgiving':
+        elif msg['message'] == 'thanksgiving':
             os.system(
                 "gsettings set org.gnome.desktop.background picture-uri file:////home/jeff/Pictures/thanksgiving.jpg")
 
-        elif msg['message'] == 'Christmas Day':
+        elif msg['message'] == 'christmas day':
             os.system(
                 "gsettings set org.gnome.desktop.background picture-uri file:////home/jeff/Pictures/christmas.jpg")
 
-        elif msg['message'] == "New Year's Day":
+        elif msg['message'] == "new year's day":
             os.system(
                 "gsettings set org.gnome.desktop.background picture-uri file:////home/jeff/Pictures/newyear.jpg")
             
-        elif msg['message'].lower() == "snow":
-            file = "/home/jeff/Videos/snow.mp4"
-            os.system("mplayer -fs  " + file)
+        elif msg['message']== "snow":
+            # file = "/home/jeff/Videos/snow.mp4"
+            # os.system("mplayer -fs  " + file)
+            os.system("video-wallpaper.sh --start ~/Videos/snow.mp4")
         
-        elif msg['message'].lower() == "rain":
-            file = "/home/jeff/Videos/rain.mp4"
-            os.system("mplayer -fs  " + file)
+        elif msg['message'] == "rain":
+            # file = "/home/jeff/Videos/rain.mp4"
+            # os.system("mplayer -fs  " + file)
+            os.system("video-wallpaper.sh --start ~/Videos/rain.mp4")
+        
+        elif msg['message'] == "clear":
+            # file = "/home/jeff/Videos/rain.mp4"
+            # os.system("mplayer -fs  " + file)
+            os.system("video-wallpaper.sh --stop")
             
-        elif msg['message'].lower() == "fog":
-            file = "/home/jeff/Videos/fog.mp4"
-            os.system("mplayer -fs  " + file)
+        elif msg['message'] == "fog":
+            # file = "/home/jeff/Videos/fog.mp4"
+            # os.system("mplayer -fs  " + file)
+            os.system("video-wallpaper.sh --start ~/Videos/fog.mp4")
+            
+        elif msg['message']== "ping":
+            send_msg("pong", "server")
 
 
 def __create_ws():
@@ -98,7 +111,7 @@ def __create_ws():
             print("Websocket connection Error  : {0}".format(e))
         if connected:
             print("Reconnecting websocket  after 10 sec")
-        time.sleep(10)
+            time.sleep(10)
 
 # todo EDIT NAME.TXT TO THE NAME OF DEVICE
 f = Path('name.json')
@@ -127,20 +140,20 @@ def useInput():
     while connected:
         dest = input("enter DEST (q to close): ")
         if dest == 'q':
+            connected = False
             print("Disconecting...")
             send_msg("close", dest)
             time.sleep(1)
             wsapp.close()
-            connected = False
             print("Closing...")
         else:
             smsg = input("enter msg (q to close): ")
             if smsg == 'q':
+                connected = False
                 print("Disconecting...")
                 send_msg("close", dest)
                 time.sleep(1)
                 wsapp.close()
-                connected = False
                 print("Closing...")
             else:
                 send_msg(smsg, dest)
