@@ -28,6 +28,9 @@ def on_open(wsapp):
     inputThead = threading.Thread(target=useInput, args=())
     inputThead.setDaemon(True)
     inputThead.start()
+    weatherThead = threading.Thread(target=check_weather, args=())
+    weatherThead.setDaemon(True)
+    weatherThead.start()
 
 
 def on_close(wsapp, close_status_code, close_msg):
@@ -129,7 +132,11 @@ else:
     # todo figure out why the client needs to be restarted when name is assigned
 #########################################################################
 
-
+def check_weather():
+    global connected
+    while connected:
+        send_msg("weather", "foyer")
+        time.sleep(200)
 
 def useInput():
     global connected
