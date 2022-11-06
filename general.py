@@ -14,16 +14,16 @@ elif platform.system() == "Windows":
 pass
 
 
-def village():
-    time.sleep(1.5)
-    #Neopixel
-    port.write(str.encode("0,4,32,10,4#"))
-    #Command
-    port.write(str.encode("show#"))
-    time.sleep(10)
-    port.write(str.encode("clear#"))
-    port.write(str.encode("show#"))   
+def power_on():
+    port.write(str.encode("pOn#"))
 
-def runVillage():
-    tProc = Process(target=tree, args=())
+def power_off():
+    port.write(str.encode("pOff#"))   
+
+def runPowerOn():
+    tProc = Process(target=power_on, args=())
+    tProc.start()   
+
+def runPowerOff():
+    tProc = Process(target=power_off, args=())
     tProc.start()
