@@ -196,14 +196,14 @@ def monitor_control():
         current_time = datetime.now()
         print(f"Sunset time: hour-{hour+11} min-{minute}")
         print(f"Current time: {current_time} monitor status: {monitor_status}")
-        if current_time.hour >= hour+11 and monitor_status == False:
+        if current_time.hour >= 17 and current_time.minute >= 50 and monitor_status == True:
         # if current_time.hour >= hour+11 and current_time.minute >= minute -1 and monitor_status == False:
-            runPowerOn()
-            monitor_status = True
-            
-        elif current_time.hour >= 17 and current_time.minute >= 29 and monitor_status == True:
             runPowerOff()
             monitor_status = False
+            
+        elif current_time.hour >= hour+11 and monitor_status == False:
+            runPowerOn()
+            monitor_status = True
         time.sleep(20)
 
 def useInput():
