@@ -107,7 +107,7 @@ def __create_ws():
     while connected:
         try:
             websocket.enableTrace(False)
-            wsapp = websocket.WebSocketApp("ws://synapse.viewdns.net:8000/ws/test/?",
+            wsapp = websocket.WebSocketApp("ws://synapse.viewdns.net:8000/ws/term/?",
                                            header={
                                                "username": name,
                                                "message": "connected",
