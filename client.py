@@ -49,6 +49,7 @@ def on_open(wsapp):
     send_msg(f"mon:{str(monitor_status)}", 'web')
 
 
+
 def on_close(wsapp, close_status_code, close_msg):
     global connected
     # print('disconnected from server')
@@ -203,11 +204,11 @@ def monitor_control():
         current_time = datetime.now()
         print(f"Sunset time: hour-{hour+12} min-{minute}")
         print(f"Current time: {current_time} monitor status: {monitor_status}")
-        if current_time.hour > 17 and monitor_status == True:
+        if current_time.hour > 19 and monitor_status == True:
             runPowerOff()
             monitor_status = False
             
-        elif current_time.hour > hour+12 and current_time.hour < 17 and monitor_status == False:
+        elif current_time.hour > hour+12 and current_time.hour < 19 and monitor_status == False:
             runPowerOn()
             monitor_status = True
         time.sleep(20)
