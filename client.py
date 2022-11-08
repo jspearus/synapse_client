@@ -46,6 +46,7 @@ def on_open(wsapp):
     monitorThead = threading.Thread(target=monitor_control, args=())
     monitorThead.setDaemon(True)
     monitorThead.start()
+    send_msg(f"mon:{str(monitor_status)}", 'web')
 
 
 def on_close(wsapp, close_status_code, close_msg):
@@ -63,6 +64,7 @@ def on_error(wsapp, error):
 def on_message(wsapp, message):
     global hour
     global minute
+    global monitor_status
     msg = json.loads(message)
     if msg['destination'] == name or msg['destination'] == "all":
         # print(f"msg: {msg['message']}")
@@ -124,10 +126,15 @@ def on_message(wsapp, message):
         elif msg['message']== "mon":
             monitor_status = True
             runPowerOn()
+            send_msg(f"mon:{str(monitor_status)}", 'web')
             
         elif msg['message']== "moff":
             monitor_status = False
             runPowerOff()
+            send_msg(f"mon:{str(monitor_status)}", 'web')
+            
+        elif msg['message']== "status":
+            send_msg(f"mon:{str(monitor_status)}", 'web')
             
         else:
             print(f"msg: {msg['message']}")
@@ -194,13 +201,13 @@ def monitor_control():
     global minute
     while connected:
         current_time = datetime.now()
-        print(f"Sunset time: hour-{hour+11} min-{minute}")
+        print(f"Sunset time: hour-{hour+12} min-{minute}")
         print(f"Current time: {current_time} monitor status: {monitor_status}")
-        if current_time.hour > 19 and monitor_status == True:
+        if current_time.hour > 17 and monitor_status == True:
             runPowerOff()
             monitor_status = False
             
-        elif current_time.hour > hour+11 and current_time.hour < 19 and monitor_status == False:
+        elif current_time.hour > hour+12 and current_time.hour < 19 and monitor_status == False:
             runPowerOn()
             monitor_status = True
         time.sleep(20)
