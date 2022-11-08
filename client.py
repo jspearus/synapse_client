@@ -207,7 +207,7 @@ def monitor_control():
             runPowerOff()
             monitor_status = False
             
-        elif current_time.hour > hour+12 and current_time.hour < 19 and monitor_status == False:
+        elif current_time.hour > hour+12 and current_time.hour < 17 and monitor_status == False:
             runPowerOn()
             monitor_status = True
         time.sleep(20)
