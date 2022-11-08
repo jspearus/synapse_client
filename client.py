@@ -85,9 +85,10 @@ def on_open(wsapp):
 
 def on_close(wsapp, close_status_code, close_msg):
     print('disconnected from server')
-    print("Retry : %s" % time.ctime())
-    time.sleep(10)
-    __create_ws()  # retry per 10 seconds
+    if connected:
+        print("Retry : %s" % time.ctime())
+        time.sleep(10)
+        __create_ws()  # retry per 10 seconds
 
 
 def on_error(wsapp, error):
@@ -128,8 +129,9 @@ def __create_ws():
                 skip_utf8_validation=True, ping_interval=10, ping_timeout=8)
         except Exception as e:
             print("Websocket connection Error  : {0}".format(e))
-        print("Reconnecting websocket  after 10 sec")
-        time.sleep(10)
+        if connected:
+            print("Reconnecting websocket  after 10 sec")
+            time.sleep(10)
 
 
 # todo EDIT NAME.TXT TO THE NAME OF DEVICE
@@ -157,21 +159,21 @@ def useInput():
     while connected:
         dest = input("enter DEST (q to close): ")
         if dest == 'q':
+            connected = False
             print("Disconecting...")
             send_msg("close", dest)
             time.sleep(1)
             wsapp.close()
-            connected = False
-            print("Closed...")
+            print("Closing...")
         else:
             smsg = input("enter msg (q to close): ")
             if smsg == 'q':
+                connected = False
                 print("Disconecting...")
                 send_msg("close", dest)
                 time.sleep(1)
                 wsapp.close()
-                connected = False
-                print("Closed...")
+                print("Closing...")
             else:
                 send_msg(smsg, dest)
                 time.sleep(.3)
