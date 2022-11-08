@@ -28,14 +28,14 @@ root = Tk()
 
 def init():
     file = "/home/pi/Videos/bootup.mp4"
-    # runtest1()
+    runtest1()
     os.system("vlc  " + file)
 
 
 def killswitch():
     file = "/home/pi/Music/012SystemImpared.mp3"
     os.system("pcmanfm --set-wallpaper /home/pi/Pictures/base.jpg")
-    # runLoad()
+    runLoad()
     os.system("vlc  " + file)
     send_msg("close", dest)
     time.sleep(1)
@@ -45,7 +45,7 @@ def killswitch():
 
 def mute():
     file = "/home/pi/Music/the_division_pulse.mp3"
-    # runCloak()
+    runCloak()
     os.system("vlc  " + file)
     os.system("sudo amixer cset numid=3 0%")
 
@@ -53,7 +53,7 @@ def mute():
 def loud():
     os.system("sudo amixer cset numid=3 100%")
     file = "/home/pi/Music/division_completed.mp3"
-    # runLoad()
+    runLoad()
     os.system("vlc  " + file)
 
 
@@ -99,6 +99,12 @@ def on_message(wsapp, message):
     if msg['destination'] == name or msg['destination'] == "all":
         print(f"Rec: {message}")
         print("enter DEST (q to close): ")
+        
+        if msg['message'] == 'loud':
+            loud()
+            
+        elif msg['message'] == 'mute':
+            mute()
 
 
 def __create_ws():
@@ -107,7 +113,7 @@ def __create_ws():
     while connected:
         try:
             websocket.enableTrace(False)
-            wsapp = websocket.WebSocketApp("ws://synapse.viewdns.net:8000/ws/test/?",
+            wsapp = websocket.WebSocketApp("ws://synapse.viewdns.net:8000/ws/term/?",
                                            header={
                                                "username": name,
                                                "message": "connected",
@@ -173,6 +179,7 @@ def useInput():
 
 if __name__ == "__main__":
     try:
+        init()
         __create_ws()
     except Exception as err:
         print(err)
