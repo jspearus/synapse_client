@@ -17,6 +17,7 @@ name = ''
 hour = 23
 minute = 59
 monitor_status = False
+current_weather = "clear"
 
 
 def send_msg(mssg, dest):
@@ -66,6 +67,7 @@ def on_message(wsapp, message):
     global hour
     global minute
     global monitor_status
+    global current_weather
     msg = json.loads(message)
     if msg['destination'] == name or msg['destination'] == "all":
         # print(f"msg: {msg['message']}")
@@ -98,27 +100,37 @@ def on_message(wsapp, message):
         elif msg['message']== "snow":
             # file = "/home/jeff/Videos/snow.mp4"
             # os.system("mplayer -fs  " + file)
-            os.system("video-wallpaper.sh --start ~/Videos/snow.mp4")
+            if msg['message'] != current_weather:
+                current_weather = msg['message']
+                os.system("video-wallpaper.sh --start ~/Videos/snow.mp4")
         
         elif msg['message'] == "rain":
             # file = "/home/jeff/Videos/rain.mp4"
             # os.system("mplayer -fs  " + file)
-            os.system("video-wallpaper.sh --start ~/Videos/rain.mp4")
+            if msg['message'] != current_weather:
+                current_weather = msg['message']
+                os.system("video-wallpaper.sh --start ~/Videos/rain.mp4")
         
         elif msg['message'] == "clear":
             # file = "/home/jeff/Videos/rain.mp4"
             # os.system("mplayer -fs  " + file)
-            os.system("video-wallpaper.sh --stop")
+            if msg['message'] != current_weather:
+                current_weather = msg['message']
+                os.system("video-wallpaper.sh --stop")
         
         elif msg['message'] == "cloud":
             # file = "/home/jeff/Videos/fog.mp4"
             # os.system("mplayer -fs  " + file)
-            os.system("video-wallpaper.sh --start ~/Videos/fog.mp4")
+            if msg['message'] != current_weather:
+                current_weather = msg['message']
+                os.system("video-wallpaper.sh --start ~/Videos/fog.mp4")
                 
         elif msg['message'] == "fog":
             # file = "/home/jeff/Videos/fog.mp4"
             # os.system("mplayer -fs  " + file)
-            os.system("video-wallpaper.sh --start ~/Videos/fog.mp4")
+            if msg['message'] != current_weather:
+                current_weather = msg['message']
+                os.system("video-wallpaper.sh --start ~/Videos/fog.mp4")
             
         elif msg['message']== "ping":
             send_msg("pong", "server")
@@ -207,10 +219,12 @@ def monitor_control():
         if current_time.hour > 19 and monitor_status == True:
             runPowerOff()
             monitor_status = False
+            send_msg(f"mon:{str(monitor_status)}", 'web')
             
         elif current_time.hour > hour+12 and current_time.hour < 19 and monitor_status == False:
             runPowerOn()
             monitor_status = True
+            send_msg(f"mon:{str(monitor_status)}", 'web')
         time.sleep(20)
 
 def useInput():
