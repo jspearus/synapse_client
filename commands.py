@@ -167,6 +167,9 @@ def run_command(command):
     elif command == 'random':
         randomEvent()
         
+    elif command == 'claws':
+        randomClaws()
+        
 ###################################################### ICONS #########################################
     
     elif command == "wreath":
