@@ -16,6 +16,7 @@ from general import runTree, runtest1, runInit, runCloak, runLoad
 from commands import run_command
 
 connected = True
+init = False
 name = ''
 auto_mode = False
 mode = "none"
@@ -46,14 +47,18 @@ root.protocol("WM_DELETE_WINDOW", on_closing)
 
 
 def on_open(wsapp):
+    global connected, init
+    if not init:
+        run_command('init')
+        init = True
     print(f"Connected as: {name} @ {time.ctime()}")
-    run_command('init')
     inputThead = threading.Thread(target=useInput, args=())
     inputThead.setDaemon(True)
     inputThead.start()
 
 
 def on_close(wsapp, close_status_code, close_msg):
+    global connected
     print('disconnected from server')
     if connected:
         print("Retry : %s" % time.ctime())
@@ -419,5 +424,6 @@ backBtn.place(x=25, y=510)
 t = threading.Thread(target=__create_ws)
 t.start()
 
-      
+if not init:
+    os.system('xdotool getactivewindow windowminimize')    
 root.mainloop()  
