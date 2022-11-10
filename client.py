@@ -220,7 +220,7 @@ def monitor_control():
     global minute
     while connected:
         current_time = datetime.now()
-        print(f"Sunset time: {sunset_time}")
+        print(f"Sunset time: {sunset_time}, MonOff time: {MonOff_time}")
         print(f"Current time: {current_time} monitor status: {monitor_status}")
         if current_time > MonOff_time and monitor_status == True:
             runPowerOff()
