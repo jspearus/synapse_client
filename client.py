@@ -69,7 +69,7 @@ def on_error(wsapp, error):
 def on_message(wsapp, message):
     global hour
     global minute
-    global monitor_status, sunset_time
+    global monitor_status, sunset_time, MonOff_time
     global current_weather
     msg = json.loads(message)
     if msg['destination'] == name or msg['destination'] == "all":
@@ -81,6 +81,8 @@ def on_message(wsapp, message):
             hour = (int(sunset[1]) - 6)+11
             minute = int(sunset[2])
             sunset_time = sunset_time.replace(hour=hour, minute=minute)
+            MonOff_time = datetime.now()
+            MonOff_time = MonOff_time.replace(hour=19, minute=00)
             print(f"hour: {hour}")
             print(f"minute: {minute}")
             print("enter DEST (q to close): ")
@@ -213,14 +215,14 @@ def check_sunset():
         
 def monitor_control():
     global monitor_status
-    global connected, sunset_time
+    global connected, sunset_time, MonOff_time
     global hour
     global minute
     while connected:
         current_time = datetime.now()
         print(f"Sunset time: {sunset_time}")
         print(f"Current time: {current_time} monitor status: {monitor_status}")
-        if current_time < MonOff_time and monitor_status == True:
+        if current_time > MonOff_time and monitor_status == True:
             runPowerOff()
             monitor_status = False
             send_msg(f"mon:{str(monitor_status)}", 'web')
