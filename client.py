@@ -18,6 +18,8 @@ hour = 23
 minute = 59
 monitor_status = False
 current_weather = "clear"
+current_datetime = datetime.now()
+current_datetime = current_datetime - timedelta(days=1)
 sunset_time = datetime.now()
 MonOff_time = datetime.now()
 MonOff_time = MonOff_time.replace(hour=19, minute=00)
@@ -208,11 +210,14 @@ def check_weather():
         time.sleep(120)
         
 def check_sunset():
-    global connected
+    global connected, current_datetime
     while connected:
-        send_msg("sunset", "foyer")
-        time.sleep(43200)
+        current_time = datetime.now()
+        if (current_time > current_datetime):
+            send_msg("sunset", "foyer")
+        time.sleep(10) 
         
+             
 def monitor_control():
     global monitor_status
     global connected, sunset_time, MonOff_time
@@ -231,7 +236,7 @@ def monitor_control():
             runPowerOn()
             monitor_status = True
             send_msg(f"mon:{str(monitor_status)}", 'web')
-        time.sleep(20)
+        time.sleep(30)
 
 def useInput():
     global connected
