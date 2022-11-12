@@ -72,7 +72,7 @@ def on_error(wsapp, error):
 def on_message(wsapp, message):
     global hour
     global minute
-    global monitor_status, sunset_time, MonOff_time
+    global monitor_status, sunset_time, MonOff_time, current_datetime
     global current_weather
     msg = json.loads(message)
     if msg['destination'] == name or msg['destination'] == "all":
@@ -81,13 +81,13 @@ def on_message(wsapp, message):
 
         if"sunset" in msg['message']:
             sunset = msg['message'].split(':')
-            hour = (int(sunset[1]) - 6)+11
+            hour = (int(sunset[1]) - 6)+12
             minute = int(sunset[2])
+            current_datetime = datetime.now()
             sunset_time = sunset_time.replace(hour=hour, minute=minute)
             MonOff_time = datetime.now()
             MonOff_time = MonOff_time.replace(hour=19, minute=00)
-            print(f"hour: {hour}")
-            print(f"minute: {minute}")
+            print(f"Sunset Time Updated => hour: {hour} : minute: {minute}")
             print("enter DEST (q to close): ")
             
         elif msg['message'] == 'halloween':
@@ -214,7 +214,8 @@ def check_sunset():
     global connected, current_datetime
     while connected:
         current_time = datetime.now()
-        if (current_time > current_datetime):
+        if (current_time.day > current_datetime.day):
+            current_datetime = datetime.now() ## todo may not need current_datetime
             send_msg("sunset", "foyer")
         time.sleep(10) 
         
@@ -224,10 +225,13 @@ def monitor_control():
     global connected, sunset_time, MonOff_time
     global hour
     global minute
+    time.sleep(5) 
     while connected:
         current_time = datetime.now()
+        sunset_time.replace(day=current_time.day)
         print(f"Sunset time: {sunset_time}, MonOff time: {MonOff_time}")
         print(f"Current time: {current_time} monitor status: {monitor_status}")
+        print("end")
         if current_time > MonOff_time and monitor_status == True:
             runPowerOff()
             monitor_status = False
