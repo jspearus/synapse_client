@@ -201,7 +201,6 @@ else:
         json.dump(data, f, ensure_ascii=False, indent=4)
     name = name = data['client']['deviceName']
     f.close()
-    # todo figure out why the client needs to be restarted when name is assigned
 #########################################################################
 
 def check_weather():
