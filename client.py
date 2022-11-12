@@ -85,8 +85,7 @@ def on_message(wsapp, message):
             minute = int(sunset[2])
             current_time = datetime.now()
             sunset_time = current_time.replace(hour=hour, minute=minute)
-            MonOff_time = datetime.now()
-            MonOff_time = MonOff_time.replace(hour=19, minute=00)
+            MonOff_time = current_time.replace(hour=19, minute=00)
             print(f"Sunset Time Updated => hour: {hour} : minute: {minute}")
             print("enter DEST (q to close): ")
             
