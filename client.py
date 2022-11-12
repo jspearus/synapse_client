@@ -68,7 +68,7 @@ def on_close(wsapp, close_status_code, close_msg):
 def on_error(wsapp, error):
     print(error)
 
-
+#todo sunset time
 def on_message(wsapp, message):
     global hour
     global minute
@@ -83,8 +83,8 @@ def on_message(wsapp, message):
             sunset = msg['message'].split(':')
             hour = (int(sunset[1]) - 6)+12
             minute = int(sunset[2])
-            current_datetime = datetime.now()
-            sunset_time = sunset_time.replace(hour=hour, minute=minute)
+            current_time = datetime.now()
+            sunset_time = current_time.replace(hour=hour, minute=minute)
             MonOff_time = datetime.now()
             MonOff_time = MonOff_time.replace(hour=19, minute=00)
             print(f"Sunset Time Updated => hour: {hour} : minute: {minute}")
@@ -209,18 +209,15 @@ def check_weather():
     while connected:
         send_msg("weather", "foyer")
         time.sleep(120)
-        
-def check_sunset():
+ #####################################################################
+def check_sunset(): #runs in thread
     global connected, current_datetime
     while connected:
-        current_time = datetime.now()
-        if (current_time.day > current_datetime.day):
-            current_datetime = datetime.now() ## todo may not need current_datetime
-            send_msg("sunset", "foyer")
-        time.sleep(10) 
+        send_msg("sunset", "foyer")
+        time.sleep(21600)
+###############################################################3
         
-             
-def monitor_control():
+def monitor_control(): # runs in thread
     global monitor_status
     global connected, sunset_time, MonOff_time
     global hour
