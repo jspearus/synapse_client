@@ -4,7 +4,7 @@ import threading
 import sys
 import time
 from datetime import datetime
-import os
+import os, platform, serial
 import json
 from pathlib import Path
 # import platform
@@ -29,6 +29,24 @@ root.config(cursor="none")
 root.title("Holiday Remote")
 root.geometry('175x620+820+20')
 
+if platform.system() == "Linux":
+    xBee = serial.Serial("/dev/ttyS0", baudrate=9600, timeout=1.0)
+    xBee.write(str.encode("Remote_Online\n"))
+    
+def serialRead():
+    global connected
+    print("xBee Listening...")
+    while connected:
+        Data = xBee.readline()
+        data = str(Data, 'UTF-8')
+        data = data.split(' ')
+        # serLabel.config(text=data[0])
+        if data[0] != "":
+            xBee.write(str.encode(f"Command Rec.. {data[0]}\n"))
+            run_command(data[0])
+        else:
+            xBee.write(str.encode("Command Failed\n"))
+
 def on_closing():
     global wsapp
     global connected
@@ -52,9 +70,15 @@ def on_open(wsapp):
         run_command('init')
         init = True
     print(f"Connected as: {name} @ {time.ctime()}")
+    
     inputThead = threading.Thread(target=useInput, args=())
     inputThead.setDaemon(True)
     inputThead.start()
+    
+    serial = threading.Thread(target=serialRead, args=())
+    serial.setDaemon(True)
+    serial.start()
+
 
 
 def on_close(wsapp, close_status_code, close_msg):
