@@ -45,7 +45,7 @@ def serialRead():
             xBee.write(str.encode(f"Command Rec.. {data[0]}\n"))
             run_command(data[0])
         else:
-            xBee.write(str.encode("Command Failed\n"))
+            pass
 
 def on_closing():
     global wsapp
