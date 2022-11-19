@@ -11,8 +11,82 @@ from pathlib import Path
 import platform
 from colorama import Fore, Back, Style
 
+from general import runTest1, runTestTop, runTreeOff
+from advent import runAdvent
+from events import runSnow, runRain
+from newyear import runNewYear
+
 connected = True
 name = ''
+hour = 23
+minute = 59
+tree_status = False
+current_weather = "clear"
+current_datetime = datetime.now()
+current_datetime = current_datetime - timedelta(days=1)
+sunset_time = datetime.now()
+TreeOff_time = datetime.now()
+TreeOff_time = TreeOff_time.replace(hour=22, minute=00)
+
+
+# todo update this fucntion every 15 mins
+def getHoliday():
+    global connected
+    global name
+    global today
+    global weather
+    send_msg("holiay", name)
+    while connected:
+        time.sleep(90)
+        if today.day < datetime.datetime.now().day:
+            today = datetime.datetime.now()
+            send_msg("holiay", name)
+            runNewYear()
+        if mode != 'off':
+            if weather == "snow":
+                runSnow()
+
+            elif weather == "rain":
+                runRain()
+
+
+def check_weather():
+    global connected, name
+    while connected:
+        send_msg("weather", name)
+        time.sleep(120)
+#####################################################################
+
+
+def check_sunset():  # runs in thread
+    global connected, current_datetime, name
+    while connected:
+        send_msg("sunset", name)
+        time.sleep(21600)
+
+
+def tree_control():  # runs in thread
+    global tree_status
+    global connected, sunset_time, TreeOff_time
+    global hour
+    global minute
+    time.sleep(5)
+    while connected:
+        current_time = datetime.now()
+        sunset_time.replace(day=current_time.day)
+        print(f"Sunset time: {sunset_time}, TreeOff time: {TreeOff_time}")
+        print(f"Current time: {current_time} tree_status: {tree_status}")
+        print("end")
+        if current_time > TreeOff_time and tree_status == True:
+            runPowerOff()
+            tree_status = False
+            send_msg(f"Tree: {str(tree_status)}", 'web')
+
+        elif current_time > sunset_time and current_time < TreeOff_time and tree_status == False:
+            runPowerOn()
+            tree_status = True
+            send_msg(f"Tree: {str(tree_status)}", 'web')
+        time.sleep(30)
 
 
 def send_msg(mssg, dest):
@@ -30,6 +104,14 @@ def on_open(wsapp):
     inputThead = threading.Thread(target=useInput, args=())
     inputThead.setDaemon(True)
     inputThead.start()
+
+    timeThead = threading.Thread(target=getHoliday, args=())
+    timeThead.setDaemon(True)
+    timeThead.start()
+
+    treeThead = threading.Thread(target=tree_control, args=())
+    treeThead.setDaemon(True)
+    treeThead.start()
 
 
 def on_close(wsapp, close_status_code, close_msg):
@@ -90,7 +172,7 @@ else:
         json.dump(data, f, ensure_ascii=False, indent=4)
     name = name = data['client']['deviceName']
     f.close()
-    # todo figure out why the client needs to be restarted when name is assigned
+
 #########################################################################
 
 
