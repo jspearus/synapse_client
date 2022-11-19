@@ -78,7 +78,6 @@ def __create_ws():
             time.sleep(10)
 
 
-# todo EDIT NAME.TXT TO THE NAME OF DEVICE
 f = Path('name.json')
 if f.is_file():
     f = open('name.json')
