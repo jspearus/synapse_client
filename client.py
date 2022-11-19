@@ -25,6 +25,7 @@ current_weather = "clear"
 current_datetime = datetime.now()
 current_datetime = current_datetime - timedelta(days=1)
 sunset_time = datetime.now()
+TreeOn_time = current_time.replace(hour=6, minute=00)
 TreeOff_time = datetime.now()
 TreeOff_time = TreeOff_time.replace(hour=22, minute=00)
 
@@ -128,10 +129,88 @@ def on_error(wsapp, error):
 
 
 def on_message(wsapp, message):
+
     msg = json.loads(message)
     if msg['destination'] == name or msg['destination'] == "all":
         print(f"Rec: {message}")
         print("enter DEST (q to close): ")
+
+        if"sunset" in msg['message']:
+            sunset = msg['message'].split(':')
+            hour = (int(sunset[1]) - 6)+12
+            minute = int(sunset[2])
+            current_time = datetime.now()
+            sunset_time = current_time.replace(hour=hour, minute=minute)
+            TreeOff_time = current_time.replace(hour=22, minute=00)
+            TreeOn_time = current_time.replace(hour=6, minute=00)
+            print(f"Sunset Time Updated => hour: {hour} : minute: {minute}")
+            print("enter DEST (q to close): ")
+
+        elif msg['message'] == 'halloween':
+            os.system(
+                "gsettings set org.gnome.desktop.background picture-uri file:////home/jeff/Pictures/halloween.jpg")
+
+        elif msg['message'] == 'thanksgiving':
+            os.system(
+                "gsettings set org.gnome.desktop.background picture-uri file:////home/jeff/Pictures/thanksgiving.jpg")
+
+        elif msg['message'] == 'christmas day':
+            os.system(
+                "gsettings set org.gnome.desktop.background picture-uri file:////home/jeff/Pictures/christmas.jpg")
+
+        elif msg['message'] == "new year's day":
+            os.system(
+                "gsettings set org.gnome.desktop.background picture-uri file:////home/jeff/Pictures/newyear.jpg")
+
+        elif msg['message'] == "snow":
+            if msg['message'] != current_weather:
+                runSnow()
+                current_weather = msg['message']
+                # os.system("video-wallpaper.sh --start ~/Videos/snow.mp4")
+
+        elif msg['message'] == "rain":
+            if msg['message'] != current_weather:
+                runRain()
+                current_weather = msg['message']
+
+                # os.system("video-wallpaper.sh --start ~/Videos/rain.mp4")
+
+        elif msg['message'] == "clear":
+            if msg['message'] != current_weather:
+                current_weather = msg['message']
+                # os.system("video-wallpaper.sh --start ~/Videos/fog.mp4")
+
+        elif msg['message'] == "cloud":
+            if msg['message'] != current_weather:
+                current_weather = msg['message']
+                # os.system("video-wallpaper.sh --start ~/Videos/fog.mp4")
+
+        elif msg['message'] == "fog":
+            if msg['message'] != current_weather:
+
+                current_weather = msg['message']
+                # os.system("video-wallpaper.sh --start ~/Videos/fog.mp4")
+
+        elif msg['message'] == "ping":
+            send_msg("pong", "server")
+            print(f"msg: {msg['message']}")
+
+        elif msg['message'] == "ton":
+            tree_status = True
+            runPowerOn()
+            send_msg(f"Tree:{str(tree_status)}", 'web')
+
+        elif msg['message'] == "toff":
+            tree_status = False
+            runPowerOff()
+            send_msg(f"Tree:{str(tree_status)}", 'web')
+
+        elif msg['message'] == "status":
+            send_msg(f"Tree:{str(tree_status)}", 'web')
+
+        else:
+            print(f"msg: {msg['message']}")
+            print("enter DEST (q to close): ")
 
 
 def __create_ws():
