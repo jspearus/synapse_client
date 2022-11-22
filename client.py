@@ -18,7 +18,7 @@ name = ''
 hour = 23
 minute = 59
 monitor_status = False
-current_weather = "clear"
+current_weather = ""
 current_datetime = datetime.now()
 current_datetime = current_datetime - timedelta(days=1)
 sunset_time = datetime.now()
@@ -85,7 +85,7 @@ def on_message(wsapp, message):
             minute = int(sunset[2])
             current_time = datetime.now()
             sunset_time = current_time.replace(hour=hour, minute=minute)
-            MonOff_time = current_time.replace(hour=19, minute=00)
+            MonOff_time = current_time.replace(hour=22, minute=00)
             print(f"Sunset Time Updated => hour: {hour} : minute: {minute}")
             print("enter DEST (q to close): ")
             
