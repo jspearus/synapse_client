@@ -18,12 +18,12 @@ name = ''
 hour = 23
 minute = 59
 monitor_status = False
-current_weather = "clear"
+current_weather = ""
 current_datetime = datetime.now()
 current_datetime = current_datetime - timedelta(days=1)
 sunset_time = datetime.now()
 MonOff_time = datetime.now()
-MonOff_time = MonOff_time.replace(hour=19, minute=00)
+MonOff_time = MonOff_time.replace(hour=22, minute=00)
 
 
 def send_msg(mssg, dest):
@@ -85,7 +85,7 @@ def on_message(wsapp, message):
             minute = int(sunset[2])
             current_time = datetime.now()
             sunset_time = current_time.replace(hour=hour, minute=minute)
-            MonOff_time = current_time.replace(hour=19, minute=00)
+            MonOff_time = current_time.replace(hour=22, minute=00)
             print(f"Sunset Time Updated => hour: {hour} : minute: {minute}")
             print("enter DEST (q to close): ")
             
@@ -124,7 +124,7 @@ def on_message(wsapp, message):
             # os.system("mplayer -fs  " + file)
             if msg['message'] != current_weather:
                 current_weather = msg['message']
-                os.system("video-wallpaper.sh --stop")
+                os.system("video-wallpaper.sh --start ~/Videos/fog.mp4")
         
         elif msg['message'] == "cloud":
             # file = "/home/jeff/Videos/fog.mp4"
