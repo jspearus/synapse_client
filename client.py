@@ -78,7 +78,7 @@ def tree_control():  # runs in thread
         TreeOn_time = TreeOn_time.replace(day=current_time.day)
         sunset_time = sunset_time.replace(day=current_time.day)
         sunset_time_2 = sunset_time_2.replace(day=current_time.day)
-        if current_time > TreeOff_time and tree_status == True and autoOn == True:
+        if current_time > TreeOff_time and (tree_status == True or vil_status == True) and autoOn == True:
             run_command("alloff")
             tree_status = False
             vil_status = False
