@@ -1,29 +1,29 @@
 import websocket
 import json
 import threading, time
-import sys
-import sched
 from datetime import datetime
 from datetime import timedelta
 import os
 import json
 from pathlib import Path
-import platform
-from colorama import Fore, Back, Style
 
 from general import runPowerOn, runPowerOff
+from street_lights import runLightsOn, runLightsOff, runLightsOnQuick
 
 connected = True
 name = ''
-hour = 23
-minute = 59
+mOffHour, mOffMin = 22, 00
+sunSet2_Offset = 20
 monitor_status = False
+lights_status = False
+autoOn = False
 current_weather = ""
 current_datetime = datetime.now()
 current_datetime = current_datetime - timedelta(days=1)
+sunset_time_2 = datetime.now()
 sunset_time = datetime.now()
 MonOff_time = datetime.now()
-MonOff_time = MonOff_time.replace(hour=22, minute=00)
+MonOff_time = MonOff_time.replace(hour=mOffHour, minute=mOffMin)
 
 
 def send_msg(mssg, dest):
@@ -46,7 +46,7 @@ def on_open(wsapp):
     weatherThead.setDaemon(True)
     weatherThead.start()
     time.sleep(3)
-    sunsetThead = threading.Thread(target=check_sunset, args=())
+    sunsetThead = threading.Thread(target=check_new_day, args=())
     sunsetThead.setDaemon(True)
     sunsetThead.start()
     time.sleep(3)
@@ -54,6 +54,10 @@ def on_open(wsapp):
     monitorThead.setDaemon(True)
     monitorThead.start()
     send_msg(f"mon:{str(monitor_status)}", 'web')
+    time.sleep(.3)
+    send_msg(f"cauto:{str(autoOn)}", 'web')
+    time.sleep(.3)
+    send_msg(f"lights:{str(lights_status)}", 'web')
 
 
 
@@ -68,12 +72,11 @@ def on_close(wsapp, close_status_code, close_msg):
 def on_error(wsapp, error):
     print(error)
 
-#todo sunset time
+
 def on_message(wsapp, message):
-    global hour
-    global minute
+    global hour, minute, mOffHour, mOffMin, sunset_time_2
     global monitor_status, sunset_time, MonOff_time, current_datetime
-    global current_weather
+    global current_weather, autoOn, lights_status, sunSet2_Offset
     msg = json.loads(message)
     if msg['destination'] == name or msg['destination'] == "all":
         # print(f"msg: {msg['message']}")
@@ -85,7 +88,8 @@ def on_message(wsapp, message):
             minute = int(sunset[2])
             current_time = datetime.now()
             sunset_time = current_time.replace(hour=hour, minute=minute)
-            MonOff_time = current_time.replace(hour=22, minute=00)
+            sunset_time_2 = current_time.replace(hour=hour, minute=minute+sunSet2_Offset)
+            MonOff_time = current_time.replace(hour=mOffHour, minute=mOffMin)
             print(f"Sunset Time Updated => hour: {hour} : minute: {minute}")
             print("enter DEST (q to close): ")
             
@@ -124,14 +128,14 @@ def on_message(wsapp, message):
             # os.system("mplayer -fs  " + file)
             if msg['message'] != current_weather:
                 current_weather = msg['message']
-                os.system("video-wallpaper.sh --start ~/Videos/fog.mp4")
+                os.system("video-wallpaper.sh --start ~/Videos/clear.mp4")
         
         elif msg['message'] == "cloud":
             # file = "/home/jeff/Videos/fog.mp4"
             # os.system("mplayer -fs  " + file)
             if msg['message'] != current_weather:
                 current_weather = msg['message']
-                os.system("video-wallpaper.sh --start ~/Videos/fog.mp4")
+                os.system("video-wallpaper.sh --start ~/Videos/cloud.mp4")
                 
         elif msg['message'] == "fog":
             # file = "/home/jeff/Videos/fog.mp4"
@@ -144,6 +148,14 @@ def on_message(wsapp, message):
             send_msg("pong", "server")
             print(f"msg: {msg['message']}")
             
+        elif msg['message']== "auto":
+            autoOn = True
+            send_msg(f"cauto:{str(autoOn)}", 'web')
+            
+        elif msg['message']== "autooff":
+            autoOn = False
+            send_msg(f"cauto:{str(autoOn)}", 'web')
+            
         elif msg['message']== "mon":
             monitor_status = True
             runPowerOn()
@@ -154,8 +166,27 @@ def on_message(wsapp, message):
             runPowerOff()
             send_msg(f"mon:{str(monitor_status)}", 'web')
             
+        elif msg['message']== "lon":
+            lights_status = True
+            runLightsOn()
+            send_msg(f"lights:{str(lights_status)}", 'web')
+            
+        elif msg['message']== "lonq":
+            lights_status = True
+            runLightsOnQuick()
+            send_msg(f"lights:{str(lights_status)}", 'web')
+            
+        elif msg['message']== "loff":
+            lights_status = False
+            runLightsOff()
+            send_msg(f"lights:{str(lights_status)}", 'web')
+            
         elif msg['message']== "status":
-            send_msg(f"mon:{str(monitor_status)}", 'web')
+            send_msg(f"cauto:{str(autoOn)}", msg['username'])
+            time.sleep(.5)
+            send_msg(f"mon:{str(monitor_status)}", msg['username'])
+            time.sleep(.5)
+            send_msg(f"lights:{str(lights_status)}", msg['username'])
             
         else:
             print(f"msg: {msg['message']}")
@@ -203,39 +234,52 @@ else:
 #########################################################################
 
 def check_weather():
-    global connected
+    global connected, name
     while connected:
-        send_msg("weather", "foyer")
+        send_msg("weather", name)
         time.sleep(120)
  #####################################################################
-def check_sunset(): #runs in thread
+def check_new_day(): #runs in thread
     global connected, current_datetime
+    global name
     while connected:
-        send_msg("sunset", "foyer")
-        time.sleep(21600)
+        if current_datetime.day < datetime.now().day:
+            current_datetime = datetime.now()
+            send_msg("sunset", name)
+        time.sleep(90)
 ###############################################################3
         
 def monitor_control(): # runs in thread
-    global monitor_status
-    global connected, sunset_time, MonOff_time
-    global hour
-    global minute
+    global monitor_status, autoOn, lights_status
+    global connected, sunset_time, MonOff_time, sunset_time_2
+    global hour, minute
     time.sleep(5) 
     while connected:
         current_time = datetime.now()
-        sunset_time.replace(day=current_time.day)
-        print(f"Sunset time: {sunset_time}, MonOff time: {MonOff_time}")
-        print(f"Current time: {current_time} monitor status: {monitor_status}")
-        print("end")
-        if current_time > MonOff_time and monitor_status == True:
+        sunset_time = sunset_time.replace(day=current_time.day)
+        sunset_time_2 = sunset_time_2.replace(day=current_time.day)
+        if current_time > MonOff_time and monitor_status == True and autoOn == True:
             runPowerOff()
+            runLightsOff()
             monitor_status = False
+            lights_status = False
             send_msg(f"mon:{str(monitor_status)}", 'web')
+            send_msg(f"lights:{str(lights_status)}", 'web')
             
-        elif current_time > sunset_time and current_time < MonOff_time and monitor_status == False:
+        elif current_time > sunset_time and current_time < MonOff_time and monitor_status == False and autoOn == True:
             runPowerOn()
             monitor_status = True
             send_msg(f"mon:{str(monitor_status)}", 'web')
+        
+        elif current_time > sunset_time_2 and current_time < MonOff_time and lights_status == False and autoOn == True:
+            runLightsOn()
+            lights_status = True
+            send_msg(f"lights:{str(lights_status)}", 'web')
+        
+        print(f"Sunset time: {sunset_time}, MonOff time: {MonOff_time}")
+        print(f"Current time: {current_time}, Sunset time_2: {sunset_time_2}")
+        print(f"Auto: {autoOn}, monitor status: {monitor_status}, Lights status: {lights_status}")
+        print("end")
         time.sleep(30)
 
 def useInput():
