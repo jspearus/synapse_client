@@ -39,7 +39,7 @@ def getHoliday():
     global connected, autoOn, name
     global  current_datetime
     global weather
-    time.sleep(5)
+    time.sleep(10)
     send_msg("holiday", name)
     while connected:
         time.sleep(90)
@@ -72,7 +72,7 @@ def check_new_day():  # runs in thread
 def tree_control():  # runs in thread
     global tree_status, autoOn, vil_status
     global connected, sunset_time, sunset_time_2, TreeOff_time, TreeOn_time
-    time.sleep(4)
+    time.sleep(5)
     while connected:
         current_time = datetime.now()
         TreeOn_time = TreeOn_time.replace(day=current_time.day)
