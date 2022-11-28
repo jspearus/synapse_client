@@ -4,94 +4,107 @@ import threading
 import sys
 import time
 import sched
-import datetime
+from datetime import datetime
+from datetime import timedelta
 import os
 import json
 from pathlib import Path
 import platform
 from colorama import Fore, Back, Style
 
-from general import runTest1, runTestTop, runTreeOff
-from advent import runAdvent
-from events import runSnow, runRain
-from newyear import runNewYear
+from commands import run_command
 
 connected = True
 name = ''
-hour = 23
-minute = 59
+TreeOn_hour, TreeOn_minute = 6, 0
+TreeOff_hour, TreeOff_minute = 22, 0
+sunSet2_Offset = 20
+
 tree_status = False
+vil_status = False
+autoOn = False
 current_weather = "clear"
 current_datetime = datetime.now()
 current_datetime = current_datetime - timedelta(days=1)
 sunset_time = datetime.now()
-TreeOn_time = current_time.replace(hour=6, minute=00)
+sunset_time_2 =datetime.now()
+TreeOn_time = datetime.now()
+TreeOn_time = current_datetime.replace(hour=TreeOn_hour, minute=TreeOn_minute)
 TreeOff_time = datetime.now()
-TreeOff_time = TreeOff_time.replace(hour=22, minute=00)
+TreeOff_time = TreeOff_time.replace(hour=TreeOff_hour, minute=TreeOff_minute)
 
 
 # todo update this fucntion every 15 mins
 def getHoliday():
-    global connected
-    global name
-    global today
+    global connected, autoOn, name
+    global  current_datetime
     global weather
-    send_msg("holiay", name)
+    time.sleep(5)
+    send_msg("holiday", name)
     while connected:
         time.sleep(90)
-        if today.day < datetime.datetime.now().day:
-            today = datetime.datetime.now()
-            send_msg("holiay", name)
-            runNewYear()
-        if mode != 'off':
-            if weather == "snow":
-                runSnow()
-
-            elif weather == "rain":
-                runRain()
+        if current_datetime.day < datetime.now().day:
+            current_datetime = datetime.now()
+            send_msg("holiday", name)
+            if autoOn:
+                run_command("advent")
 
 
 def check_weather():
     global connected, name
     while connected:
         send_msg("weather", name)
-        time.sleep(120)
+        time.sleep(300)
 #####################################################################
 
 
-def check_sunset():  # runs in thread
-    global connected, current_datetime, name
+def check_new_day():  # runs in thread
+    global connected, name
+    global  current_datetime
+    time.sleep(2)
     while connected:
-        send_msg("sunset", name)
-        time.sleep(21600)
+        if current_datetime.day < datetime.now().day:
+            current_datetime = datetime.now()
+            send_msg("sunset", name)
+        time.sleep(90)
 
 
 def tree_control():  # runs in thread
-    global tree_status
-    global connected, sunset_time, TreeOff_time
-    global hour
-    global minute
-    time.sleep(5)
+    global tree_status, autoOn, vil_status
+    global connected, sunset_time, sunset_time_2, TreeOff_time, TreeOn_time
+    time.sleep(4)
     while connected:
         current_time = datetime.now()
-        sunset_time.replace(day=current_time.day)
-        print(f"Sunset time: {sunset_time}, TreeOff time: {TreeOff_time}")
-        print(f"Current time: {current_time} tree_status: {tree_status}")
-        print("end")
-        if current_time > TreeOff_time and tree_status == True:
-            runPowerOff()
+        TreeOn_time = TreeOn_time.replace(day=current_time.day)
+        sunset_time = sunset_time.replace(day=current_time.day)
+        sunset_time_2 = sunset_time_2.replace(day=current_time.day)
+        if current_time > TreeOff_time and tree_status == True and autoOn == True:
+            run_command("alloff")
             tree_status = False
-            send_msg(f"Tree: {str(tree_status)}", 'web')
+            vil_status = False
+            send_msg(f"tree:{str(tree_status)}", 'web')
+            time.sleep(.2)
+            send_msg(f"vil:{str(vil_status)}", 'web')
+            
+        elif current_time > sunset_time_2 and current_time < TreeOff_time and vil_status == False and autoOn == True:
+            vil_status = True
+            run_command("vil")
+            send_msg(f"vil:{str(vil_status)}", 'web')
 
-        elif current_time > sunset_time and current_time < TreeOff_time and tree_status == False:
-            runPowerOn()
+        elif current_time > TreeOn_time and current_time < TreeOff_time and tree_status == False and autoOn == True:
+            run_command("mon")
             tree_status = True
-            send_msg(f"Tree: {str(tree_status)}", 'web')
+            send_msg(f"tree:{str(tree_status)}", 'web')
+        print(f"TreeOn: {TreeOn_time}, TreeOff: {TreeOff_time}")
+        print(f"SunSet: {sunset_time}, SunSet_2: {sunset_time_2}")
+        print(f"Current Time: {current_time}")
+        print(f"Auto_status: {autoOn}, tree_status: {tree_status}, village_status: {vil_status}")
+        print("end")
         time.sleep(30)
 
 
 def send_msg(mssg, dest):
-    global wsapp
+    global wsapp, name
     msg = {'message': mssg,
            'username': name,
            'destination': dest}
@@ -105,14 +118,28 @@ def on_open(wsapp):
     inputThead = threading.Thread(target=useInput, args=())
     inputThead.setDaemon(True)
     inputThead.start()
+    
+    sunsetThead = threading.Thread(target=check_new_day, args=())
+    sunsetThead.setDaemon(True)
+    sunsetThead.start()
 
-    timeThead = threading.Thread(target=getHoliday, args=())
-    timeThead.setDaemon(True)
-    timeThead.start()
+    holidayThead = threading.Thread(target=getHoliday, args=())
+    holidayThead.setDaemon(True)
+    holidayThead.start()
 
     treeThead = threading.Thread(target=tree_control, args=())
     treeThead.setDaemon(True)
     treeThead.start()
+    
+    weatherThead = threading.Thread(target=check_weather, args=())
+    weatherThead.setDaemon(True)
+    weatherThead.start()
+    
+    send_msg(f"tree:{str(tree_status)}", 'web')
+    time.sleep(1)
+    send_msg(f"vil:{str(vil_status)}", 'web')
+    time.sleep(1)
+    send_msg(f"tauto:{str(autoOn)}", 'web')
 
 
 def on_close(wsapp, close_status_code, close_msg):
@@ -129,7 +156,9 @@ def on_error(wsapp, error):
 
 
 def on_message(wsapp, message):
-
+    global current_weather, sunset_time, sunset_time_2, name
+    global tree_status, autoOn, vil_status, sunSet2_Offset, TreeOff_time, TreeOn_time
+    global TreeOn_hour, TreeOn_minute, TreeOff_hour, TreeOn_minute
     msg = json.loads(message)
     if msg['destination'] == name or msg['destination'] == "all":
         print(f"Rec: {message}")
@@ -141,76 +170,125 @@ def on_message(wsapp, message):
             minute = int(sunset[2])
             current_time = datetime.now()
             sunset_time = current_time.replace(hour=hour, minute=minute)
-            TreeOff_time = current_time.replace(hour=22, minute=00)
-            TreeOn_time = current_time.replace(hour=6, minute=00)
+            sunset_time_2 = sunset_time_2 = current_time.replace(hour=hour, minute=minute+sunSet2_Offset)
+            TreeOff_time = current_time.replace(hour=TreeOff_hour, minute=TreeOff_minute)
+            TreeOn_time = current_time.replace(hour=TreeOn_hour, minute=TreeOn_minute)
             print(f"Sunset Time Updated => hour: {hour} : minute: {minute}")
             print("enter DEST (q to close): ")
 
         elif msg['message'] == 'halloween':
             os.system(
-                "gsettings set org.gnome.desktop.background picture-uri file:////home/jeff/Pictures/halloween.jpg")
+                "pcmanfm --set-wallpaper /home/pi/Pictures/halloween.jpg")
 
         elif msg['message'] == 'thanksgiving':
             os.system(
-                "gsettings set org.gnome.desktop.background picture-uri file:////home/jeff/Pictures/thanksgiving.jpg")
+                "pcmanfm --set-wallpaper /home/pi/Pictures/thanksgiving.jpg")
 
         elif msg['message'] == 'christmas day':
             os.system(
-                "gsettings set org.gnome.desktop.background picture-uri file:////home/jeff/Pictures/christmas.jpg")
+                "pcmanfm --set-wallpaper /home/pi/Pictures/christmas.jpg")
 
         elif msg['message'] == "new year's day":
             os.system(
-                "gsettings set org.gnome.desktop.background picture-uri file:////home/jeff/Pictures/newyear.jpg")
+                "pcmanfm --set-wallpaper /home/pi/Pictures/newyear.jpg")
 
         elif msg['message'] == "snow":
             if msg['message'] != current_weather:
-                runSnow()
                 current_weather = msg['message']
+                send_msg(f"UPDATE: {str(current_weather)}", 'web')
+            run_command(msg['message'])
                 # os.system("video-wallpaper.sh --start ~/Videos/snow.mp4")
 
-        elif msg['message'] == "rain":
+        elif msg['message'] == "rain" and tree_status == True:
             if msg['message'] != current_weather:
-                runRain()
                 current_weather = msg['message']
-
+                send_msg(f"UPDATE: {str(current_weather)}", 'web')
+            run_command(msg['message'])
                 # os.system("video-wallpaper.sh --start ~/Videos/rain.mp4")
 
-        elif msg['message'] == "clear":
+        elif msg['message'] == "clear" and tree_status == True:
             if msg['message'] != current_weather:
                 current_weather = msg['message']
+                send_msg(f"UPDATE: {str(current_weather)}", 'web')
+                run_command(msg['message'])
                 # os.system("video-wallpaper.sh --start ~/Videos/fog.mp4")
 
-        elif msg['message'] == "cloud":
+        elif msg['message'] == "cloud" and tree_status == True:
             if msg['message'] != current_weather:
                 current_weather = msg['message']
+                send_msg(f"UPDATE: {str(current_weather)}", 'web')
+                run_command(msg['message'])
                 # os.system("video-wallpaper.sh --start ~/Videos/fog.mp4")
 
-        elif msg['message'] == "fog":
+        elif msg['message'] == "fog" and tree_status == True:
             if msg['message'] != current_weather:
-
+                run_command(msg['message'])
+                send_msg(f"UPDATE: {str(current_weather)}", 'web')
                 current_weather = msg['message']
                 # os.system("video-wallpaper.sh --start ~/Videos/fog.mp4")
 
         elif msg['message'] == "ping":
             send_msg("pong", "server")
             print(f"msg: {msg['message']}")
+            
+        elif msg['message'] == "auto":
+            autoOn = True
+            send_msg(f"tauto:{str(autoOn)}", 'web')
+            
+        elif msg['message'] == "autooff":
+            autoOn = False
+            send_msg(f"tauto:{str(autoOn)}", 'web')
 
-        elif msg['message'] == "ton":
+        elif msg['message'] == "mon":
             tree_status = True
-            runPowerOn()
-            send_msg(f"Tree:{str(tree_status)}", 'web')
+            run_command(msg['message'])
+            send_msg(f"tree:{str(tree_status)}", 'web')
 
-        elif msg['message'] == "toff":
+        elif msg['message'] == "moff":
             tree_status = False
-            runPowerOff()
-            send_msg(f"Tree:{str(tree_status)}", 'web')
+            run_command(msg['message'])
+            send_msg(f"tree:{str(tree_status)}", 'web')
+            
+        elif msg['message'] == "alloff":
+            tree_status = False
+            vil_status = False
+            run_command(msg['message'])
+            send_msg(f"tree:{str(tree_status)}", 'web')
+            time.sleep(.5)
+            send_msg(f"vil:{str(vil_status)}", 'web')
+            
+        elif msg['message'] == "vil":
+            vil_status = True
+            run_command(msg['message'])
+            send_msg(f"vil:{str(vil_status)}", 'web')
+
+        elif msg['message'] == "viloff":
+            vil_status = False
+            run_command(msg['message'])
+            send_msg(f"vil:{str(vil_status)}", 'web')
+            
+        elif msg['message'] == "vilq":
+            vil_status = True
+            run_command(msg['message'])
+            send_msg(f"vil:{str(vil_status)}", 'web')
+            
+        elif msg['message'] == "viloffq":
+            vil_status = False
+            run_command(msg['message'])
+            send_msg(f"vil:{str(vil_status)}", 'web')
+
 
         elif msg['message'] == "status":
-            send_msg(f"Tree:{str(tree_status)}", 'web')
+            send_msg(f"tauto:{str(autoOn)}", msg['username'])
+            time.sleep(.5)
+            send_msg(f"tree:{str(tree_status)}", msg['username'])
+            time.sleep(.5)
+            send_msg(f"vil:{str(vil_status)}", msg['username'])
 
         else:
             print(f"msg: {msg['message']}")
             print("enter DEST (q to close): ")
+            run_command(msg['message'])
 
 
 def __create_ws():
