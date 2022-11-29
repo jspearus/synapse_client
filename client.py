@@ -42,10 +42,10 @@ def on_open(wsapp):
     inputThead.setDaemon(True)
     inputThead.start()
     time.sleep(3)
-    weatherThead = threading.Thread(target=check_weather, args=())
-    weatherThead.setDaemon(True)
-    weatherThead.start()
-    time.sleep(3)
+    # weatherThead = threading.Thread(target=check_weather, args=())
+    # weatherThead.setDaemon(True)
+    # weatherThead.start()
+    # time.sleep(3)
     sunsetThead = threading.Thread(target=check_new_day, args=())
     sunsetThead.setDaemon(True)
     sunsetThead.start()
@@ -58,6 +58,7 @@ def on_open(wsapp):
     send_msg(f"cauto:{str(autoOn)}", 'web')
     time.sleep(.3)
     send_msg(f"lights:{str(lights_status)}", 'web')
+    os.system("video-wallpaper.sh --start ~/Videos/snow.mp4")
 
 
 
