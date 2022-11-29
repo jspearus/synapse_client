@@ -106,7 +106,8 @@ def runCommand(command):
     elif command == 'alloff' and comFree == True:
         comFree = False
         temp = village_off()
-        comFree = runTreeOff()
+        time.sleep(1)
+        comFree = treeOff()
         if debug:
             print(f"{command}: {comFree}")
         

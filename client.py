@@ -16,6 +16,8 @@ from commands import run_command
 
 connected = True
 name = ''
+
+hour, minute = 16, 30
 TreeOn_hour, TreeOn_minute = 6, 0
 TreeOff_hour, TreeOff_minute = 22, 0
 sunSet2_Offset = 20
@@ -27,7 +29,8 @@ current_weather = "clear"
 current_datetime = datetime.now()
 current_datetime = current_datetime - timedelta(days=1)
 sunset_time = datetime.now()
-sunset_time_2 =datetime.now()
+sunset_time = sunset_time.replace(hour=hour, minute=minute)
+sunset_time_2 =sunset_time.replace(hour=hour, minute=minute+sunSet2_Offset)
 TreeOn_time = datetime.now()
 TreeOn_time = current_datetime.replace(hour=TreeOn_hour, minute=TreeOn_minute)
 TreeOff_time = datetime.now()
@@ -36,7 +39,7 @@ TreeOff_time = TreeOff_time.replace(hour=TreeOff_hour, minute=TreeOff_minute)
 
 # todo update this fucntion every 15 mins
 def getHoliday():
-    global connected, autoOn, name
+    global connected, tree_status, name
     global  current_datetime
     global weather
     time.sleep(10)
@@ -46,14 +49,16 @@ def getHoliday():
         if current_datetime.day < datetime.now().day:
             current_datetime = datetime.now()
             send_msg("holiday", name)
-            if autoOn:
+            if tree_status:
                 run_command("advent")
 
 
 def check_weather():
-    global connected, name
+    global connected, name, tree_status
+    time.sleep(15)
     while connected:
-        send_msg("weather", name)
+        if tree_status:
+            send_msg("weather", name)
         time.sleep(300)
 #####################################################################
 
@@ -61,7 +66,7 @@ def check_weather():
 def check_new_day():  # runs in thread
     global connected, name
     global  current_datetime
-    time.sleep(2)
+    time.sleep(5)
     while connected:
         if current_datetime.day < datetime.now().day:
             current_datetime = datetime.now()
@@ -69,15 +74,11 @@ def check_new_day():  # runs in thread
         time.sleep(90)
 
 
-def tree_control():  # runs in thread
+def tree_control(): # runs in thread
     global tree_status, autoOn, vil_status
     global connected, sunset_time, sunset_time_2, TreeOff_time, TreeOn_time
-    time.sleep(5)
     while connected:
         current_time = datetime.now()
-        TreeOn_time = TreeOn_time.replace(day=current_time.day)
-        sunset_time = sunset_time.replace(day=current_time.day)
-        sunset_time_2 = sunset_time_2.replace(day=current_time.day)
         if current_time > TreeOff_time and (tree_status == True or vil_status == True) and autoOn == True:
             run_command("alloff")
             tree_status = False
@@ -156,7 +157,7 @@ def on_error(wsapp, error):
 
 
 def on_message(wsapp, message):
-    global current_weather, sunset_time, sunset_time_2, name
+    global current_weather, sunset_time, sunset_time_2, name, hour, minute
     global tree_status, autoOn, vil_status, sunSet2_Offset, TreeOff_time, TreeOn_time
     global TreeOn_hour, TreeOn_minute, TreeOff_hour, TreeOn_minute
     msg = json.loads(message)
