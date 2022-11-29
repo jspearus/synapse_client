@@ -17,7 +17,7 @@ pass
 def advent():
     day = datetime.date.today()
     for i in range(50):
-        port.write(str.encode(f"1,{i},0,100,0#"))
+        port.write(str.encode(f"1,{i},0,200,0#"))
         port.write(str.encode("show1#"))
         time.sleep(.02)
     for i in range(100, -1, -1):
