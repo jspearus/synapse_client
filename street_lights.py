@@ -12,14 +12,19 @@ pass
 
 
 def power_on():
-    port.write(str.encode("tOn#"))
+    port.write(str.encode("sOn#"))
+    time.sleep(10)
+    port.write(str.encode("tOnq#"))
     
 def power_on_quick():
+    port.write(str.encode("sOnq#"))
+    time.sleep(5)
     port.write(str.encode("tOnq#"))
-
-def power_off():
-    port.write(str.encode("tOff#")) 
     
+def power_off():
+    port.write(str.encode("sOff#"))
+    time.sleep(10) 
+    port.write(str.encode("tOff#"))
     
       
 
