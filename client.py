@@ -42,6 +42,7 @@ def on_open(wsapp):
     inputThead.setDaemon(True)
     inputThead.start()
     time.sleep(3)
+    #todo uncomment to get weather updates
     # weatherThead = threading.Thread(target=check_weather, args=())
     # weatherThead.setDaemon(True)
     # weatherThead.start()
