@@ -37,22 +37,6 @@ TreeOff_time = datetime.now()
 TreeOff_time = TreeOff_time.replace(hour=TreeOff_hour, minute=TreeOff_minute)
 
 
-# todo update this fucntion every 15 mins
-def getHoliday():
-    global connected, tree_status, name
-    global  current_datetime
-    global weather
-    time.sleep(10)
-    send_msg("holiday", name)
-    while connected:
-        time.sleep(90)
-        if current_datetime.day < datetime.now().day:
-            current_datetime = datetime.now()
-            send_msg("holiday", name)
-            if tree_status:
-                run_command("advent")
-
-
 def check_weather():
     global connected, name, tree_status
     time.sleep(15)
@@ -71,6 +55,10 @@ def check_new_day():  # runs in thread
         if current_datetime.day < datetime.now().day:
             current_datetime = datetime.now()
             send_msg("sunset", name)
+            time.sleep(15)
+            send_msg("holiday", name)
+            if tree_status:
+                run_command("advent")
         time.sleep(90)
 
 
@@ -120,13 +108,9 @@ def on_open(wsapp):
     inputThead.setDaemon(True)
     inputThead.start()
     
-    sunsetThead = threading.Thread(target=check_new_day, args=())
-    sunsetThead.setDaemon(True)
-    sunsetThead.start()
-
-    holidayThead = threading.Thread(target=getHoliday, args=())
-    holidayThead.setDaemon(True)
-    holidayThead.start()
+    newDayThead = threading.Thread(target=check_new_day, args=())
+    newDayThead.setDaemon(True)
+    newDayThead.start()
 
     treeThead = threading.Thread(target=tree_control, args=())
     treeThead.setDaemon(True)
