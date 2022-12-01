@@ -247,7 +247,7 @@ def check_new_day(): #runs in thread
     while connected:
         if current_day.day < datetime.now().day:
             current_day = datetime.now()
-            send_msg("sunset", name)
+            send_msg("sunset", "all")
         time.sleep(90)
 ###############################################################3
         
