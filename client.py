@@ -37,61 +37,6 @@ TreeOff_time = datetime.now()
 TreeOff_time = TreeOff_time.replace(hour=TreeOff_hour, minute=TreeOff_minute)
 
 
-def check_weather():
-    global connected, name, tree_status
-    time.sleep(15)
-    while connected:
-        if tree_status:
-            send_msg("weather", name)
-        time.sleep(300)
-#####################################################################
-
-
-def check_new_day():  # runs in thread
-    global connected, name
-    global  current_day
-    time.sleep(5)
-    while connected:
-        if current_day.day < datetime.now().day:
-            current_day = datetime.now()
-            send_msg("holiday", name)
-            time.sleep(.7)
-            send_msg("sunset", "all")
-            if tree_status:
-                run_command("advent")
-        time.sleep(90)
-
-
-def tree_control(): # runs in thread
-    global tree_status, autoOn, vil_status
-    global connected, sunset_time, sunset_time_2, TreeOff_time, TreeOn_time
-    while connected:
-        current_time = datetime.now()
-        if current_time > TreeOff_time and (tree_status == True or vil_status == True) and autoOn == True:
-            run_command("alloff")
-            tree_status = False
-            vil_status = False
-            send_msg(f"tree:{str(tree_status)}", 'web')
-            time.sleep(.2)
-            send_msg(f"vil:{str(vil_status)}", 'web')
-            
-        elif current_time > sunset_time_2 and current_time < TreeOff_time and vil_status == False and autoOn == True:
-            vil_status = True
-            run_command("vil")
-            send_msg(f"vil:{str(vil_status)}", 'web')
-
-        elif current_time > TreeOn_time and current_time < TreeOff_time and tree_status == False and autoOn == True:
-            run_command("mon")
-            tree_status = True
-            send_msg(f"tree:{str(tree_status)}", 'web')
-        print(f"TreeOn: {TreeOn_time}, TreeOff: {TreeOff_time}")
-        print(f"SunSet: {sunset_time}, SunSet_2: {sunset_time_2}")
-        print(f"Current Time: {current_time}")
-        print(f"Auto_status: {autoOn}, tree_status: {tree_status}, village_status: {vil_status}")
-        print("end")
-        time.sleep(30)
-
-
 def send_msg(mssg, dest):
     global wsapp, name
     msg = {'message': mssg,
@@ -155,7 +100,7 @@ def on_message(wsapp, message):
             minute = int(sunset[2])
             current_time = datetime.now()
             sunset_time = current_time.replace(hour=hour, minute=minute)
-            sunset_time_2 = sunset_time_2 = current_time.replace(hour=hour, minute=minute+sunSet2_Offset)
+            sunset_time_2 = current_time.replace(hour=hour, minute=minute+sunSet2_Offset)
             TreeOff_time = current_time.replace(hour=TreeOff_hour, minute=TreeOff_minute)
             TreeOn_time = current_time.replace(hour=TreeOn_hour, minute=TreeOn_minute)
             print(f"Sunset Time Updated => hour: {hour} : minute: {minute}")
@@ -316,6 +261,66 @@ else:
     f.close()
 
 #########################################################################
+def check_weather():    # runs in thread
+    global connected, name, tree_status
+    time.sleep(15)
+    while connected:
+        if tree_status:
+            send_msg("weather", name)
+        time.sleep(300)
+#####################################################################
+
+
+def check_new_day():  # runs in thread
+    global connected, name
+    global  current_day
+    time.sleep(5)
+    print("New Day Updater Running...")
+    while connected:
+        if current_day.day < datetime.now().day or current_day.month < datetime.now().month:
+            current_day = datetime.now()
+            send_msg("holiday", name)
+            time.sleep(.7)
+            send_msg("sunset", "all")
+            if tree_status:
+                run_command("advent")
+        time.sleep(90)
+        
+########################################################################
+
+def tree_control(): # runs in thread
+    global tree_status, autoOn, vil_status
+    global connected, sunset_time, sunset_time_2, TreeOff_time, TreeOn_time
+    time.sleep(20) 
+    while connected:
+        current_time = datetime.now()
+        sunset_time = sunset_time.replace(day=current_time.day)
+        sunset_time_2 = sunset_time_2.replace(day=current_time.day)
+        TreeOn_time = TreeOn_time.replace(day=current_time.day)
+        TreeOff_time = TreeOff_time.replace(day=current_time.day)
+        if current_time > TreeOff_time and (tree_status == True or vil_status == True) and autoOn == True:
+            run_command("alloff")
+            tree_status = False
+            vil_status = False
+            send_msg(f"tree:{str(tree_status)}", 'web')
+            time.sleep(.2)
+            send_msg(f"vil:{str(vil_status)}", 'web')
+            
+        elif current_time > sunset_time_2 and current_time < TreeOff_time and vil_status == False and autoOn == True:
+            vil_status = True
+            run_command("vil")
+            send_msg(f"vil:{str(vil_status)}", 'web')
+
+        elif current_time > TreeOn_time and current_time < TreeOff_time and tree_status == False and autoOn == True:
+            run_command("mon")
+            tree_status = True
+            send_msg(f"tree:{str(tree_status)}", 'web')
+        print(f"TreeOn: {TreeOn_time}, TreeOff: {TreeOff_time}")
+        print(f"SunSet: {sunset_time}, SunSet_2: {sunset_time_2}")
+        print(f"Current Time: {current_time}")
+        print(f"Auto_status: {autoOn}, tree_status: {tree_status}, village_status: {vil_status}")
+        print("end")
+        time.sleep(30)
 
 
 def useInput():
