@@ -21,8 +21,9 @@ autoOn = False
 current_weather = ""
 current_datetime = datetime.now()
 current_day = current_datetime - timedelta(days=1)
-sunset_time_2 = datetime.now()
 sunset_time = datetime.now()
+sunset_time = sunset_time.replace(hour=hour, minute=minute)
+sunset_time_2 = sunset_time.replace(hour=hour, minute=minute+sunSet2_Offset)
 MonOff_time = datetime.now()
 MonOff_time = MonOff_time.replace(hour=mOffHour, minute=mOffMin)
 
@@ -249,7 +250,7 @@ def check_new_day(): #runs in thread
     time.sleep(20)
     print("New Day Updater Running...")
     while connected:
-        if current_day.day < datetime.now().day or current_day.month < datetime.now().month:
+        if current_day.day != datetime.now().day:
             current_day = datetime.now()
             send_msg("sunset", "all")
         time.sleep(90)
