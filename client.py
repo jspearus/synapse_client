@@ -19,7 +19,7 @@ lights_status = False
 autoOn = False
 current_weather = ""
 current_datetime = datetime.now()
-current_datetime = current_datetime - timedelta(days=1)
+current_day = current_datetime - timedelta(days=1)
 sunset_time_2 = datetime.now()
 sunset_time = datetime.now()
 MonOff_time = datetime.now()
@@ -242,11 +242,11 @@ def check_weather():
         time.sleep(120)
  #####################################################################
 def check_new_day(): #runs in thread
-    global connected, current_datetime
+    global connected, current_day
     global name
     while connected:
-        if current_datetime.day < datetime.now().day:
-            current_datetime = datetime.now()
+        if current_day.day < datetime.now().day:
+            current_day = datetime.now()
             send_msg("sunset", name)
         time.sleep(90)
 ###############################################################3
@@ -260,6 +260,7 @@ def monitor_control(): # runs in thread
         current_time = datetime.now()
         sunset_time = sunset_time.replace(day=current_time.day)
         sunset_time_2 = sunset_time_2.replace(day=current_time.day)
+        MonOff_time = MonOff_time.replace(day=current_time.day)
         if current_time > MonOff_time and monitor_status == True and autoOn == True:
             runPowerOff()
             runLightsOff()
