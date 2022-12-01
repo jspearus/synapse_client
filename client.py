@@ -54,9 +54,9 @@ def check_new_day():  # runs in thread
     while connected:
         if current_day.day < datetime.now().day:
             current_day = datetime.now()
-            send_msg("sunset", name)
-            time.sleep(.7)
             send_msg("holiday", name)
+            time.sleep(.7)
+            send_msg("sunset", "all")
             if tree_status:
                 run_command("advent")
         time.sleep(90)
