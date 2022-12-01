@@ -27,7 +27,7 @@ vil_status = False
 autoOn = False
 current_weather = "clear"
 current_datetime = datetime.now()
-current_datetime = current_datetime - timedelta(days=1)
+current_day = current_datetime - timedelta(days=1)
 sunset_time = datetime.now()
 sunset_time = sunset_time.replace(hour=hour, minute=minute)
 sunset_time_2 =sunset_time.replace(hour=hour, minute=minute+sunSet2_Offset)
@@ -49,13 +49,13 @@ def check_weather():
 
 def check_new_day():  # runs in thread
     global connected, name
-    global  current_datetime
+    global  current_day
     time.sleep(5)
     while connected:
-        if current_datetime.day < datetime.now().day:
-            current_datetime = datetime.now()
+        if current_day.day < datetime.now().day:
+            current_day = datetime.now()
             send_msg("sunset", name)
-            time.sleep(15)
+            time.sleep(.7)
             send_msg("holiday", name)
             if tree_status:
                 run_command("advent")
