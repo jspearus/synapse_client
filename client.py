@@ -13,6 +13,7 @@ from street_lights import runLightsOn, runLightsOff, runLightsOnQuick
 connected = True
 name = ''
 mOffHour, mOffMin = 22, 00
+hour, minute = 16, 30
 sunSet2_Offset = 20
 monitor_status = False
 lights_status = False
@@ -237,6 +238,7 @@ else:
 
 def check_weather():
     global connected, name
+    time.sleep(15)
     while connected:
         send_msg("weather", name)
         time.sleep(120)
@@ -244,8 +246,10 @@ def check_weather():
 def check_new_day(): #runs in thread
     global connected, current_day
     global name
+    time.sleep(20)
+    print("New Day Updater Running...")
     while connected:
-        if current_day.day < datetime.now().day:
+        if current_day.day < datetime.now().day or current_day.month < datetime.now().month:
             current_day = datetime.now()
             send_msg("sunset", "all")
         time.sleep(90)
@@ -255,7 +259,7 @@ def monitor_control(): # runs in thread
     global monitor_status, autoOn, lights_status
     global connected, sunset_time, MonOff_time, sunset_time_2
     global hour, minute
-    time.sleep(5) 
+    time.sleep(10) 
     while connected:
         current_time = datetime.now()
         sunset_time = sunset_time.replace(day=current_time.day)
