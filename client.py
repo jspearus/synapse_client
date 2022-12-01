@@ -277,7 +277,7 @@ def check_new_day():  # runs in thread
     time.sleep(5)
     print("New Day Updater Running...")
     while connected:
-        if current_day.day < datetime.now().day or current_day.month < datetime.now().month:
+        if current_day.day != datetime.now().day:
             current_day = datetime.now()
             send_msg("holiday", name)
             time.sleep(.7)
