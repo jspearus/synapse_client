@@ -21,11 +21,9 @@ autoOn = False
 current_weather = ""
 current_datetime = datetime.now()
 current_day = current_datetime - timedelta(days=1)
-sunset_time = datetime.now()
-sunset_time = sunset_time.replace(hour=hour, minute=minute)
-sunset_time_2 = sunset_time.replace(hour=hour, minute=minute+sunSet2_Offset)
-MonOff_time = datetime.now()
-MonOff_time = MonOff_time.replace(hour=mOffHour, minute=mOffMin)
+sunset_time = current_datetime.replace(hour=hour, minute=minute)
+sunset_time_2 = current_datetime.replace(hour=hour, minute=minute+sunSet2_Offset)
+MonOff_time = current_datetime.replace(hour=mOffHour, minute=mOffMin)
 
 
 def send_msg(mssg, dest):
