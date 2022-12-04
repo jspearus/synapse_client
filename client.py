@@ -17,24 +17,24 @@ from commands import run_command
 connected = True
 name = ''
 
-hour, minute = 16, 30
-TreeOn_hour, TreeOn_minute = 6, 0
+MorningOn_hour, MorningOn_minute = 4, 00
+TreeOn_hour, TreeOn_minute = 7, 30
 TreeOff_hour, TreeOff_minute = 22, 0
+hour, minute = 16, 30
 sunSet2_Offset = 20
 
 tree_status = False
+morning_status = False
 vil_status = False
 autoOn = False
 current_weather = "clear"
 current_datetime = datetime.now()
 current_day = current_datetime - timedelta(days=1)
-sunset_time = datetime.now()
-sunset_time = sunset_time.replace(hour=hour, minute=minute)
-sunset_time_2 =sunset_time.replace(hour=hour, minute=minute+sunSet2_Offset)
-TreeOn_time = datetime.now()
+sunset_time = current_datetime.replace(hour=hour, minute=minute)
+sunset_time_2 =current_datetime.replace(hour=hour, minute=minute+sunSet2_Offset)
 TreeOn_time = current_datetime.replace(hour=TreeOn_hour, minute=TreeOn_minute)
-TreeOff_time = datetime.now()
-TreeOff_time = TreeOff_time.replace(hour=TreeOff_hour, minute=TreeOff_minute)
+MorningOn_time = current_datetime.replace(hour=MorningOn_hour, minute=MorningOn_minute)
+TreeOff_time = current_datetime.replace(hour=TreeOff_hour, minute=TreeOff_minute)
 
 
 def send_msg(mssg, dest):
@@ -89,6 +89,7 @@ def on_message(wsapp, message):
     global current_weather, sunset_time, sunset_time_2, name, hour, minute
     global tree_status, autoOn, vil_status, sunSet2_Offset, TreeOff_time, TreeOn_time
     global TreeOn_hour, TreeOn_minute, TreeOff_hour, TreeOn_minute
+    global MorningOn_time, MorningOn_hour, MorningOn_minute
     msg = json.loads(message)
     if msg['destination'] == name or msg['destination'] == "all":
         print(f"Rec: {message}")
@@ -103,6 +104,7 @@ def on_message(wsapp, message):
             sunset_time_2 = current_time.replace(hour=hour, minute=minute+sunSet2_Offset)
             TreeOff_time = current_time.replace(hour=TreeOff_hour, minute=TreeOff_minute)
             TreeOn_time = current_time.replace(hour=TreeOn_hour, minute=TreeOn_minute)
+            MorningOn_time = current_time.replace(hour=MorningOn_hour, minute=MorningOn_minute)
             print(f"Sunset Time Updated => hour: {hour} : minute: {minute}")
             print("enter DEST (q to close): ")
 
@@ -289,13 +291,14 @@ def check_new_day():  # runs in thread
 ########################################################################
 
 def tree_control(): # runs in thread
-    global tree_status, autoOn, vil_status
+    global tree_status, autoOn, vil_status, MorningOn_time, morning_status
     global connected, sunset_time, sunset_time_2, TreeOff_time, TreeOn_time
     time.sleep(20) 
     while connected:
         current_time = datetime.now()
         sunset_time = sunset_time.replace(day=current_time.day)
         sunset_time_2 = sunset_time_2.replace(day=current_time.day)
+        MorningOn_time = MorningOn_time.replace(day=current_time.day)
         TreeOn_time = TreeOn_time.replace(day=current_time.day)
         TreeOff_time = TreeOff_time.replace(day=current_time.day)
         if current_time > TreeOff_time and (tree_status == True or vil_status == True) and autoOn == True:
@@ -314,11 +317,19 @@ def tree_control(): # runs in thread
         elif current_time > TreeOn_time and current_time < TreeOff_time and tree_status == False and autoOn == True:
             run_command("mon")
             tree_status = True
+            morning_status = False
             send_msg(f"tree:{str(tree_status)}", 'web')
+            
+        elif current_time > MorningOn_time and current_time < TreeOn_time and morning_status == False and autoOn == True:
+            run_command("madvent")
+            morning_status = True
+            send_msg(f"tree:{str(morning_status)}", 'web')
+            
+            
         print(f"TreeOn: {TreeOn_time}, TreeOff: {TreeOff_time}")
         print(f"SunSet: {sunset_time}, SunSet_2: {sunset_time_2}")
-        print(f"Current Time: {current_time}")
-        print(f"Auto_status: {autoOn}, tree_status: {tree_status}, village_status: {vil_status}")
+        print(f"C Time: {current_time}, Morn_On: {MorningOn_time}")
+        print(f"Auto_status: {autoOn}, morning_status: {morning_status}, tree_status: {tree_status}, village_status: {vil_status}")
         print("end")
         time.sleep(30)
 

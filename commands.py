@@ -13,7 +13,7 @@ from colorama import Fore, Back, Style
 from multiprocessing import Process
 
 from general import test1, testTop, treeOff
-from advent import advent
+from advent import advent, morningAdvent
 from events import snow, rain, cloud, fog, clear
 from newyear import newYear
 from village import village_on, village_off, village_on_quick, village_off_quick
@@ -70,6 +70,12 @@ def runCommand(command):
     elif command == 'advent' and comFree == True:
         comFree = False
         comFree = advent()
+        if debug:
+            print(f"{command}: {comFree}")
+            
+    elif command == 'madvent' and comFree == True:
+        comFree = False
+        comFree = morningAdvent()
         if debug:
             print(f"{command}: {comFree}")
     
