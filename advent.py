@@ -7,15 +7,16 @@ import platform
 import serial
 from serial.serialutil import Timeout
 
-# if platform.system() == "Linux":
-#     port = serial.Serial("/dev/ttyACM0", baudrate=115200, timeout=3.0)
-# elif platform.system() == "Windows":
-# pass
+if platform.system() == "Linux":
+    port = serial.Serial("/dev/ttyACM0", baudrate=115200, timeout=3.0)
+elif platform.system() == "Windows":
+    port = serial.Serial(port="COM15", baudrate=115200, timeout=3.0)
+pass
 
-port = serial.Serial(port="COM15", baudrate=115200, timeout=3.0)
-
+print(platform.system())
 
 def advent():
+    print("ADVENT")
     day = datetime.date.today()
     for i in range(50, -1, -1):
         port.write(str.encode(f"1,{i},0,100,0#"))
