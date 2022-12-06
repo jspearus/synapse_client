@@ -11,6 +11,8 @@ from pathlib import Path
 import platform
 from colorama import Fore, Back, Style
 
+from commands import run_command
+
 connected = True
 name = ''
 
@@ -50,6 +52,10 @@ def on_message(wsapp, message):
     if msg['destination'] == name or msg['destination'] == "all":
         print(f"Rec: {message}")
         print("enter DEST (q to close): ")
+        if msg['message'] == "mon":
+            tree_status = True
+            run_command(msg['message'])
+            send_msg(f"tree:{str(tree_status)}", 'web')
 
 
 def __create_ws():
