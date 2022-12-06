@@ -12,7 +12,7 @@ import platform
 from colorama import Fore, Back, Style
 from multiprocessing import Process
 
-# from general import test1, testTop, treeOff
+from general import test1, testTop, treeOff
 from advent import advent, morningAdvent
 
 comFree = True
