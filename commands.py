@@ -15,7 +15,7 @@ from multiprocessing import Process
 from general import test1, testTop, treeOff
 from advent import advent, morningAdvent
 from events import snow, rain, cloud, fog, clear
-from newyear import newYear
+from newyear import newYear, fire_works
 from village import village_on, village_off, village_on_quick, village_off_quick
 
 
@@ -125,6 +125,13 @@ def runCommand(command):
     elif command == 'viloffq' and comFree == True:
         comFree = False
         comFree = village_off_quick()
+        if debug:
+            print(f"{command}: {comFree}")
+            
+    elif command == 'fire' and comFree == True:
+        comFree = False
+        temp =fire_works()
+        comFree = advent()
         if debug:
             print(f"{command}: {comFree}")
         
