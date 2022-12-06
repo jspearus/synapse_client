@@ -41,13 +41,13 @@ def test1():
 def treeOff():
     for i in range(50):
         port.write(str.encode(f"1,{i},200,0,0#"))
-        port.write(str.encode("show1#"))
+        port.write(str.encode("show#"))
         time.sleep(.07)
     time.sleep(1)
 
     for i in range(50):
         port.write(str.encode(f"1,{i},0,0,0#"))
-        port.write(str.encode("show1#"))
+        port.write(str.encode("show#"))
         time.sleep(.07)
     return True
 
