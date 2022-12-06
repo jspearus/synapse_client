@@ -56,6 +56,10 @@ def on_message(wsapp, message):
             tree_status = True
             run_command(msg['message'])
             send_msg(f"tree:{str(tree_status)}", 'web')
+        elif msg['message'] == "moff":
+            tree_status = False
+            run_command(msg['message'])
+            send_msg(f"tree:{str(tree_status)}", 'web')
 
 
 def __create_ws():

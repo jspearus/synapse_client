@@ -16,7 +16,6 @@ pass
 print(platform.system())
 
 def advent():
-    print("ADVENT")
     day = datetime.date.today()
     for i in range(50, -1, -1):
         port.write(str.encode(f"1,{i},0,100,0#"))

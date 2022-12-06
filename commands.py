@@ -24,7 +24,6 @@ def runCommand(command):
 ################################################# COMMANDS ######################################
     if command == 'mon' and comFree == True:
         comFree = False
-        print(f"{command}: {comFree}")
         comFree = advent()
         if debug:
             print(f"{command}: {comFree}")
