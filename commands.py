@@ -14,6 +14,7 @@ from multiprocessing import Process
 
 from general import test1, testTop, treeOff
 from advent import advent, morningAdvent
+from events import snow, rain, cloud, fog, clear
 
 comFree = True
 debug = True
@@ -31,6 +32,48 @@ def runCommand(command):
     elif command == 'moff' and comFree == True:
         comFree = False
         comFree = treeOff()
+        if debug:
+            print(f"{command}: {comFree}")
+            
+    elif command == 'snow' and comFree == True:
+        comFree = False
+        comFree = snow()
+        if debug:
+            print(f"{command}: {comFree}")
+                
+    elif command == 'rain' and comFree == True:
+        comFree = False
+        comFree = rain()
+        if debug:
+            print(f"{command}: {comFree}")
+        
+    elif command == 'clear' and comFree == True:
+        comFree = False
+        comFree = advent()
+        if debug:
+            print(f"{command}: {comFree}")
+    
+    elif command == 'cloud' and comFree == True:
+        comFree = False
+        comFree = advent()
+        if debug:
+            print(f"{command}: {comFree}")
+        
+    elif command == 'fog' and comFree == True:
+        comFree = False
+        comFree = morningAdvent()
+        if debug:
+            print(f"{command}: {comFree}")
+        
+    elif command == 'advent' and comFree == True:
+        comFree = False
+        comFree = advent()
+        if debug:
+            print(f"{command}: {comFree}")
+            
+    elif command == 'madvent' and comFree == True:
+        comFree = False
+        comFree = morningAdvent()
         if debug:
             print(f"{command}: {comFree}")
 
