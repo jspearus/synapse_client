@@ -51,19 +51,19 @@ def runCommand(command):
         
     elif command == 'clear' and comFree == True:
         comFree = False
-        comFree = clear()
+        comFree = advent()
         if debug:
             print(f"{command}: {comFree}")
     
     elif command == 'cloud' and comFree == True:
         comFree = False
-        comFree = cloud()
+        comFree = advent()
         if debug:
             print(f"{command}: {comFree}")
         
     elif command == 'fog' and comFree == True:
         comFree = False
-        comFree = fog()
+        comFree = morningAdvent()
         if debug:
             print(f"{command}: {comFree}")
         

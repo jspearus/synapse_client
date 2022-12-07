@@ -3,6 +3,7 @@ from multiprocessing import Process
 import sys
 import os
 import time
+import random
 import platform
 import serial
 from serial.serialutil import Timeout
@@ -16,46 +17,42 @@ elif platform.system() == "Windows":
 pass
 
 
+def get_event_lights():
+    eventLights = []
+    n = random.randint(10,20)
+    for i in range(n):
+        l = random.randint(5,100)
+        eventLights.append(l)
+    print(f"event Lights: {eventLights}")
+    return eventLights
+    
+
 def snow():
-    day = datetime.date.today()
-    for i in range(50):
-        port.write(str.encode(f"1,{i},200,200,200#"))
-        port.write(str.encode("show1#"))
-        time.sleep(.01)
+    advent()
+    for l in get_event_lights():
+        port.write(str.encode(f"0,{l},100,100,100#"))
+        port.write(str.encode("show#"))
+        time.sleep(1)
     return True
 
-
-
 def rain():
-    day = datetime.date.today()
-    for i in range(50):
-        port.write(str.encode(f"1,{i},0,0,200#"))
-        port.write(str.encode("show1#"))
-        time.sleep(.01)
+    advent()
+    for l in get_event_lights():
+        port.write(str.encode(f"0,{l},0,0,200#"))
+        port.write(str.encode("show#"))
+        time.sleep(1)
     return True
 
 def cloud():
-    day = datetime.date.today()
-    for i in range(50):
-        port.write(str.encode(f"1,{i},0,200,0#"))
-        port.write(str.encode("show1#"))
-        time.sleep(.01)
+    advent()
     return True
 
 def fog():
-    day = datetime.date.today()
-    for i in range(50):
-        port.write(str.encode(f"1,{i},0,200,0#"))
-        port.write(str.encode("show1#"))
-        time.sleep(.01)
+    advent()
     return True
 
 def clear():
-    day = datetime.date.today()
-    for i in range(50):
-        port.write(str.encode(f"1,{i},0,200,0#"))
-        port.write(str.encode("show1#"))
-        time.sleep(.01)
+    advent()
     return True
 
 
