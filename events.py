@@ -19,7 +19,7 @@ pass
 
 def get_event_lights():
     eventLights = []
-    n = random.randint(10,20)
+    n = random.randint(5,12)
     for i in range(n):
         l = random.randint(5,100)
         eventLights.append(l)
