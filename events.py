@@ -7,7 +7,7 @@ import random
 import platform
 import serial
 from serial.serialutil import Timeout
-from advent import advent
+from advent import advent, qadvent
 from newyear import newYear
 
 if platform.system() == "Linux":
@@ -28,7 +28,7 @@ def get_event_lights():
     
 
 def snow():
-    advent()
+    qadvent()
     for l in get_event_lights():
         port.write(str.encode(f"0,{l},100,100,100#"))
         port.write(str.encode("show#"))
@@ -36,7 +36,7 @@ def snow():
     return True
 
 def rain():
-    advent()
+    qadvent()
     for l in get_event_lights():
         port.write(str.encode(f"0,{l},0,0,200#"))
         port.write(str.encode("show#"))
