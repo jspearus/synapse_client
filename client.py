@@ -220,6 +220,8 @@ def on_message(wsapp, message):
             send_msg(f"tree:{str(tree_status)}", msg['username'])
             time.sleep(.5)
             send_msg(f"vil:{str(vil_status)}", msg['username'])
+            time.sleep(.5)
+            send_msg(f"ip: {get_ip()}", 'web')
         
         elif msg['message'] == "exit":
             send_msg("Shutting Down...", 'web')
