@@ -1,4 +1,5 @@
 import websocket
+import socket
 import json
 import threading
 import sys
@@ -26,7 +27,7 @@ sunSet2_Offset = 20
 tree_status = False
 morning_status = False
 vil_status = False
-autoOn = False
+autoOn = True
 current_weather = "clear"
 current_datetime = datetime.now()
 current_day = current_datetime - timedelta(days=1)
@@ -70,6 +71,8 @@ def on_open(wsapp):
     send_msg(f"vil:{str(vil_status)}", 'web')
     time.sleep(1)
     send_msg(f"tauto:{str(autoOn)}", 'web')
+    time.sleep(.5)
+    send_msg(f"ip: {get_ip()}", 'web')
 
 
 def on_close(wsapp, close_status_code, close_msg):
@@ -90,6 +93,7 @@ def on_message(wsapp, message):
     global tree_status, autoOn, vil_status, sunSet2_Offset, TreeOff_time, TreeOn_time
     global TreeOn_hour, TreeOn_minute, TreeOff_hour, TreeOn_minute
     global MorningOn_time, MorningOn_hour, MorningOn_minute
+    global connected
     msg = json.loads(message)
     if msg['destination'] == name or msg['destination'] == "all":
         print(f"Rec: {message}")
@@ -216,6 +220,16 @@ def on_message(wsapp, message):
             send_msg(f"tree:{str(tree_status)}", msg['username'])
             time.sleep(.5)
             send_msg(f"vil:{str(vil_status)}", msg['username'])
+        
+        elif msg['message'] == "exit":
+            send_msg("Shutting Down...", 'web')
+            time.sleep(1)
+            connected = False
+            print("Disconecting...")
+            send_msg("close", name)
+            time.sleep(1)
+            wsapp.close()
+            print("Closing...")
 
         else:
             print(f"msg: {msg['message']}")
@@ -360,6 +374,19 @@ def useInput():
             else:
                 send_msg(smsg, dest)
                 time.sleep(.3)
+                
+def get_ip():
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.settimeout(0)
+        try:
+            # doesn't even have to be reachable
+            s.connect(('10.254.254.254', 1))
+            IP = s.getsockname()[0]
+        except Exception:
+            IP = '127.0.0.1'
+        finally:
+            s.close()
+        return IP
 
 
 if __name__ == "__main__":
