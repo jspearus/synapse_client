@@ -49,7 +49,7 @@ if platform.system() == "Linux":
     xBee.write(str.encode("Xbee Connecting..\n"))
     
 def serialRead():
-    global connected
+    global connected, auto_mode
     print("xBee Listening...")
     while connected:
         Data = xBee.readline()
@@ -57,9 +57,16 @@ def serialRead():
         data = data.split(' ')
         # serLabel.config(text=data[0])
         if data[0] != "":
-            xBee.write(str.encode(f"Command Rec.. {data[0]}\n"))
-            run_command(data[0])
-            time.sleep(.5)
+            if data[0] == "auto":
+                auto_mode = True
+                send_msg(f"remauto:{str(auto_mode)}", 'web')
+            elif data[0] == "autooff":
+                auto_mode = False
+                send_msg(f"remauto:{str(auto_mode)}", 'web')
+            else:
+                xBee.write(str.encode(f"Command Rec.. {data[0]}\n"))
+                run_command(data[0])
+                time.sleep(.5)
         else:
             pass
 
@@ -117,6 +124,7 @@ def on_error(wsapp, error):
 
 def on_message(wsapp, message):
     global init, auto_mode, mode, connected, name, pre_command
+    global pre_time
     msg = json.loads(message)
     if msg['destination'] == name or msg['destination'] == "all":
         print(f"Rec: {message}")
@@ -147,7 +155,7 @@ def on_message(wsapp, message):
         elif msg['message'] == "status":
             send_msg(f"remauto:{str(auto_mode)}", msg['username'])
             time.sleep(.5)
-            send_msg(f"reminit:{str(init)}", msg['username'])
+            send_msg(f"remnextevent:{str(pre_time)}", msg['username'])
             time.sleep(.5)
             send_msg(f"remmode:{str(mode)}", msg['username'])
             time.sleep(.5)
@@ -230,7 +238,7 @@ def send_msg(mssg, dest):
     # print(f"Sent: {msg}")
 
 
-# todo EDIT NAME.TXT TO THE NAME OF DEVICE
+
 f = Path('name.json')
 if f.is_file():
     f = open('name.json')
@@ -243,7 +251,7 @@ else:
         json.dump(data, f, ensure_ascii=False, indent=4)
     name = name = data['client']['deviceName']
     f.close()
-    # todo figure out why the client needs to be restarted when name is assigned
+
 #########################################################################
 
 
@@ -277,12 +285,12 @@ def useInput():
             else:
                 send_msg(smsg, dest)
                 time.sleep(.3)
+
                 
 def eventCTRLr():
     global DataIn, mode, name
     global pre_time, auto_mode
-    global connected
-
+    global connected, pre_command
     print("timer Running")
     while connected:
         today = datetime.now()
@@ -299,11 +307,10 @@ def eventCTRLr():
             pre_command = run_command(mode)
         if auto_mode:
             if today >= pre_time:
-                addMin = random.randint(10, 20, size=(1))
-                
-                print(int(addMin))
-                pre_command = run_command('random')
+                addMin = random.randint(10, 20, size=(1)) 
                 pre_time = today + timedelta(minutes=int(addMin))
+                print(f"Next Event: {pre_time}")
+                pre_command = run_command('random')
         time.sleep(20)
 
 ############################# USER INTERFACE ###################################
