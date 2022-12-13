@@ -155,11 +155,13 @@ def on_message(wsapp, message):
         elif msg['message'] == "status":
             send_msg(f"remauto:{str(auto_mode)}", msg['username'])
             time.sleep(.5)
-            send_msg(f"remnextevent:{str(pre_time)}", msg['username'])
+            send_msg(f"remnextevent:{str(pre_time.time())}", msg['username'])
             time.sleep(.5)
             send_msg(f"remmode:{str(mode)}", msg['username'])
             time.sleep(.5)
             send_msg(f"remcomm:{str(pre_command)}", 'web')
+            time.sleep(.5)
+            send_msg(f"weather", 'web')
             time.sleep(.5)
             send_msg(f"ip: {get_ip()}", 'web')
         
@@ -311,6 +313,7 @@ def eventCTRLr():
                 pre_time = today + timedelta(minutes=int(addMin))
                 print(f"Next Event: {pre_time}")
                 pre_command = run_command('random')
+                send_msg(f"remnextevent:{str(pre_time.time())}", 'web')
         time.sleep(20)
 
 ############################# USER INTERFACE ###################################
