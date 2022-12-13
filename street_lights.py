@@ -13,17 +13,20 @@ pass
 
 def power_on():
     port.write(str.encode("sOn#"))
-    time.sleep(10)
-    port.write(str.encode("tOnq#"))
     
 def power_on_quick():
     port.write(str.encode("sOnq#"))
-    time.sleep(5)
-    port.write(str.encode("tOnq#"))
     
 def power_off():
     port.write(str.encode("sOff#"))
-    time.sleep(10) 
+    
+def trees_on():
+    port.write(str.encode("tOn#"))
+    
+def trees_on_quick():
+    port.write(str.encode("tOnq#"))
+    
+def trees_off():
     port.write(str.encode("tOff#"))
     
       
@@ -39,3 +42,16 @@ def runLightsOnQuick():
 def runLightsOff():
     tProc = Process(target=power_off, args=())
     tProc.start()
+    
+def runTreesOn():
+    tProc = Process(target=trees_on, args=())
+    tProc.start()
+    
+def runTreesOnQuick():
+    tProc = Process(target=trees_on_quick, args=())
+    tProc.start()  
+
+def runTreesOff():
+    tProc = Process(target=trees_off, args=())
+    tProc.start()
+

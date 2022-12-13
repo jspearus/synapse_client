@@ -1,14 +1,16 @@
 import websocket
+import socket
 import json
 import threading, time
 from datetime import datetime
 from datetime import timedelta
-import os
+import os, sys
 import json
 from pathlib import Path
 
 from general import runPowerOn, runPowerOff
 from street_lights import runLightsOn, runLightsOff, runLightsOnQuick
+from street_lights import runTreesOn, runTreesOnQuick, runTreesOff
 
 connected = True
 name = ''
@@ -17,6 +19,7 @@ hour, minute = 16, 30
 sunSet2_Offset = 20
 monitor_status = False
 lights_status = False
+trees_status = False
 autoOn = False
 current_weather = ""
 current_datetime = datetime.now()
@@ -59,6 +62,8 @@ def on_open(wsapp):
     send_msg(f"cauto:{str(autoOn)}", 'web')
     time.sleep(.3)
     send_msg(f"lights:{str(lights_status)}", 'web')
+    time.sleep(.3)
+    send_msg(f"ip: {get_ip()}", 'web')
     os.system("video-wallpaper.sh --start ~/Videos/snow.mp4")
 
 
@@ -76,9 +81,9 @@ def on_error(wsapp, error):
 
 
 def on_message(wsapp, message):
-    global hour, minute, mOffHour, mOffMin, sunset_time_2
+    global hour, minute, mOffHour, mOffMin, sunset_time_2, connected
     global monitor_status, sunset_time, MonOff_time, current_datetime
-    global current_weather, autoOn, lights_status, sunSet2_Offset
+    global current_weather, autoOn, lights_status, trees_status, sunSet2_Offset
     msg = json.loads(message)
     if msg['destination'] == name or msg['destination'] == "all":
         # print(f"msg: {msg['message']}")
@@ -183,12 +188,72 @@ def on_message(wsapp, message):
             runLightsOff()
             send_msg(f"lights:{str(lights_status)}", 'web')
             
+        elif msg['message']== "ton":
+            trees_status = True
+            runTreesOn()
+            send_msg(f"trees:{str(trees_status)}", 'web')
+            
+        elif msg['message']== "tonq":
+            trees_status = True
+            runTreesOnQuick()
+            send_msg(f"trees:{str(trees_status)}", 'web')
+            
+        elif msg['message']== "toff":
+            trees_status = False
+            runTreesOff()
+            send_msg(f"trees:{str(trees_status)}", 'web')
+            
         elif msg['message']== "status":
             send_msg(f"cauto:{str(autoOn)}", msg['username'])
             time.sleep(.5)
             send_msg(f"mon:{str(monitor_status)}", msg['username'])
             time.sleep(.5)
             send_msg(f"lights:{str(lights_status)}", msg['username'])
+            time.sleep(.5)
+            send_msg(f"trees:{str(trees_status)}", msg['username'])
+            time.sleep(.5)
+            send_msg(f"ip: {get_ip()}", 'web')
+        
+        elif msg['message'] == "shutdown":
+            os.system("video-wallpaper.sh --stop")
+            send_msg("Shutting Down...", 'web')
+            runLightsOff()
+            runTreesOff()
+            if monitor_status == True:
+                runPowerOff()
+            time.sleep(10)
+            connected = False
+            print("Disconecting...")
+            send_msg("close", name)
+            time.sleep(1)
+            wsapp.close()
+            print("Closing...")
+            os.system("sudo shutdown now")
+            
+        elif msg['message'] == "reboot":
+            os.system("video-wallpaper.sh --stop")
+            send_msg("Rebooting Now...", 'web')
+            runLightsOff()
+            runTreesOff()
+            time.sleep(10)
+            connected = False
+            print("Disconecting...")
+            send_msg("close", name)
+            time.sleep(1)
+            wsapp.close()
+            print("Closing...")
+            os.system("sudo reboot now")
+            
+        elif msg['message'] == "exit":
+            os.system("video-wallpaper.sh --stop")
+            send_msg("Shutting Down...", 'web')
+            time.sleep(1)
+            connected = False
+            print("Disconecting...")
+            send_msg("close", name)
+            time.sleep(1)
+            wsapp.close()
+            print("Closing...")
             
         else:
             print(f"msg: {msg['message']}")
@@ -255,7 +320,7 @@ def check_new_day(): #runs in thread
 ###############################################################3
         
 def monitor_control(): # runs in thread
-    global monitor_status, autoOn, lights_status
+    global monitor_status, autoOn, lights_status, trees_status
     global connected, sunset_time, MonOff_time, sunset_time_2
     global hour, minute
     time.sleep(10) 
@@ -267,10 +332,13 @@ def monitor_control(): # runs in thread
         if current_time > MonOff_time and monitor_status == True and autoOn == True:
             runPowerOff()
             runLightsOff()
+            runTreesOff()
             monitor_status = False
             lights_status = False
+            trees_status = False
             send_msg(f"mon:{str(monitor_status)}", 'web')
             send_msg(f"lights:{str(lights_status)}", 'web')
+            send_msg(f"trees:{str(trees_status)}", 'web')
             
         elif current_time > sunset_time and current_time < MonOff_time and monitor_status == False and autoOn == True:
             runPowerOn()
@@ -281,10 +349,14 @@ def monitor_control(): # runs in thread
             runLightsOn()
             lights_status = True
             send_msg(f"lights:{str(lights_status)}", 'web')
+            time.sleep(10)
+            runTreesOn()
+            trees_status = True
+            send_msg(f"trees:{str(trees_status)}", 'web')
         
         print(f"Sunset time: {sunset_time}, MonOff time: {MonOff_time}")
         print(f"Current time: {current_time}, Sunset time_2: {sunset_time_2}")
-        print(f"Auto: {autoOn}, monitor status: {monitor_status}, Lights status: {lights_status}")
+        print(f"Auto: {autoOn}, monitor status: {monitor_status}, Trees status: {trees_status}, Lights status: {lights_status}")
         print("end")
         time.sleep(30)
 
@@ -317,6 +389,19 @@ def useInput():
             else:
                 send_msg(smsg, dest)
                 time.sleep(.3)
+                
+def get_ip():
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.settimeout(0)
+        try:
+            # doesn't even have to be reachable
+            s.connect(('10.254.254.254', 1))
+            IP = s.getsockname()[0]
+        except Exception:
+            IP = '127.0.0.1'
+        finally:
+            s.close()
+        return IP
 
 
 if __name__ == "__main__":
