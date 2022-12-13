@@ -4,13 +4,13 @@ import threading
 import sys
 import time
 from datetime import datetime
-import os, platform, serial
+from datetime import timedelta
+import os, platform, serial, socket
 import json
 from pathlib import Path
-# import platform
 from colorama import Back, Style
-
 from tkinter import *
+from numpy import random
 
 from general import runTree, runtest1, runInit, runCloak, runLoad
 from commands import run_command
@@ -21,17 +21,32 @@ name = ''
 auto_mode = False
 mode = "none"
 today = datetime.now()
+pre_time = today
+pre_command = "None"
 
 root = Tk()
+
+def on_closing():
+    global wsapp
+    global connected
+    os.system("pcmanfm --set-wallpaper /home/pi/Pictures/base.jpg")
+    print("Disconecting...")
+    send_msg('close', 'q')
+    time.sleep(5)
+    connected = False
+    wsapp.close()
+    print("Closing...")
+    root.destroy()
 
 root.configure(background='black')
 root.config(cursor="none")
 root.title("Holiday Remote")
 root.geometry('175x620+820+20')
+root.protocol("WM_DELETE_WINDOW", on_closing) 
 
 if platform.system() == "Linux":
     xBee = serial.Serial("/dev/ttyS0", baudrate=9600, timeout=1.0)
-    xBee.write(str.encode("Remote_Online\n"))
+    xBee.write(str.encode("Xbee Connecting..\n"))
     
 def serialRead():
     global connected
@@ -44,33 +59,25 @@ def serialRead():
         if data[0] != "":
             xBee.write(str.encode(f"Command Rec.. {data[0]}\n"))
             run_command(data[0])
+            time.sleep(.5)
         else:
             pass
 
-def on_closing():
-    global wsapp
-    global connected
-    print("Disconecting...")
-    send_msg('close', 'q')
-    connected = False
-    time.sleep(1)
-    wsapp.close()
-    print("Closing...")
-    root.destroy()
+ 
     
-root.protocol("WM_DELETE_WINDOW", on_closing)  
 
 #######################################################################################
 
 
 
 def on_open(wsapp):
-    global connected, init
+    global connected, init, auto_mode, mode, pre_command
     if not init:
         run_command('init')
         init = True
+        xBee.write(str.encode("Remote_Online\n"))
     print(f"Connected as: {name} @ {time.ctime()}")
-    
+    os.system("pcmanfm --set-wallpaper /home/pi/Pictures/christmas.jpg")
     inputThead = threading.Thread(target=useInput, args=())
     inputThead.setDaemon(True)
     inputThead.start()
@@ -78,6 +85,20 @@ def on_open(wsapp):
     serial = threading.Thread(target=serialRead, args=())
     serial.setDaemon(True)
     serial.start()
+    
+    eventThread = threading.Thread(target=eventCTRLr, args=())
+    eventThread.setDaemon(True)
+    eventThread.start()
+    
+    send_msg(f"remauto:{str(auto_mode)}", 'web')
+    time.sleep(.5)
+    send_msg(f"reminit:{str(init)}", 'web')
+    time.sleep(.5)
+    send_msg(f"remmode:{str(mode)}", 'web')
+    time.sleep(.5)
+    send_msg(f"remcomm:{str(pre_command)}", 'web')
+    time.sleep(.5)
+    send_msg(f"ip: {get_ip()}", 'web')
 
 
 
@@ -95,19 +116,83 @@ def on_error(wsapp, error):
 
 
 def on_message(wsapp, message):
+    global init, auto_mode, mode, connected, name, pre_command
     msg = json.loads(message)
     if msg['destination'] == name or msg['destination'] == "all":
         print(f"Rec: {message}")
         print("enter DEST (q to close): ")
-        if(msg['message'] == 'kill'):
+        if(msg['message'] == 'auto'):
+            auto_mode = True
+            send_msg(f"remauto:{str(auto_mode)}", 'web')
+            
+        elif(msg['message'] == 'autooff'):
+            auto_mode = False
+            send_msg(f"remauto:{str(auto_mode)}", 'web')
+            
+        elif(msg['message'] == 'loud'):
+            mode = msg['message']
+            send_msg(f"remmode:{str(mode)}", 'web')
+            pre_command = run_command(msg['message'])
+            
+        elif(msg['message'] == 'mute'):
+            mode = msg['message']
+            send_msg(f"remmode:{str(mode)}", 'web')
+            pre_command = run_command(msg['message'])
+            
+        elif(msg['message'] == 'init'):
+            mode = msg['message']
+            send_msg(f"remmode:{str(mode)}", 'web')
+            pre_command = run_command(msg['message'])
+            
+        elif msg['message'] == "status":
+            send_msg(f"remauto:{str(auto_mode)}", msg['username'])
+            time.sleep(.5)
+            send_msg(f"reminit:{str(init)}", msg['username'])
+            time.sleep(.5)
+            send_msg(f"remmode:{str(mode)}", msg['username'])
+            time.sleep(.5)
+            send_msg(f"remcomm:{str(pre_command)}", 'web')
+            time.sleep(.5)
+            send_msg(f"ip: {get_ip()}", 'web')
+        
+        elif msg['message'] == "exit":
+            send_msg("Disconnecting Now...", 'web')
+            time.sleep(1)
+            on_closing()
+            
+        elif msg['message'] == "shutdown":
+            send_msg("Shutting Down Now...", 'web')
             file = "/home/pi/Music/012SystemImpared.mp3"
             os.system("pcmanfm --set-wallpaper /home/pi/Pictures/base.jpg")
             runLoad()
             os.system("vlc  " + file)
-            time.sleep(8)
-            on_closing()
+            connected = False
+            print("Disconecting...")
+            send_msg("close", name)
+            time.sleep(1)
+            wsapp.close()
+            print("Closing..."
+                  )
+            time.sleep(5)
+            os.system("sudo shutdown now")
+            
+        elif msg['message'] == "reboot":
+            send_msg("Rebooting Now...", 'web')
+            file = "/home/pi/Music/016RebootingCoreFunctions.mp3"
+            os.system("pcmanfm --set-wallpaper /home/pi/Pictures/base.jpg")
+            runLoad()
+            os.system("vlc  " + file)
+            connected = False
+            print("Disconecting...")
+            send_msg("close", name)
+            time.sleep(1)
+            wsapp.close()
+            print("Closing...")
+            time.sleep(5)
+            os.system("sudo reboot now")
+            
         else:
-            run_command(msg['message'])
+            pre_command = run_command(msg['message'])
 
 
 def __create_ws():
@@ -170,6 +255,7 @@ def useInput():
     while connected:
         dest = input("enter DEST (q to close): ")
         if dest == 'q':
+            os.system("pcmanfm --set-wallpaper /home/pi/Pictures/base.jpg")
             connected = False
             print("Disconecting...")
             send_msg("close", dest)
@@ -180,6 +266,7 @@ def useInput():
         else:
             smsg = input("enter msg (q to close): ")
             if smsg == 'q':
+                os.system("pcmanfm --set-wallpaper /home/pi/Pictures/base.jpg")
                 connected = False
                 print("Disconecting...")
                 send_msg("close", dest)
@@ -190,6 +277,34 @@ def useInput():
             else:
                 send_msg(smsg, dest)
                 time.sleep(.3)
+                
+def eventCTRLr():
+    global DataIn, mode, name
+    global pre_time, auto_mode
+    global connected
+
+    print("timer Running")
+    while connected:
+        today = datetime.now()
+        if today.hour > 12 and mode != "loud":
+            mode = "loud"
+            pre_command = run_command(mode)
+
+        elif today.hour > 5 and today.hour < 13 and mode != "mute":
+            mode = "mute"
+            pre_command = run_command(mode)
+            
+        elif today.hour < 6 and mode != "init":
+            mode = "init"
+            pre_command = run_command(mode)
+        if auto_mode:
+            if today >= pre_time:
+                addMin = random.randint(10, 20, size=(1))
+                
+                print(int(addMin))
+                pre_command = run_command('random')
+                pre_time = today + timedelta(minutes=int(addMin))
+        time.sleep(20)
 
 ############################# USER INTERFACE ###################################
 def fromUI(data):
@@ -211,7 +326,7 @@ def fromUI(data):
         Settings.place_forget()
         controlPanel.place(x=10, y=5)
     else:
-        run_command(data)
+        pre_command = run_command(data)
         
 controlPanel = LabelFrame(
     root,
@@ -447,7 +562,19 @@ backBtn.place(x=25, y=510)
 
 t = threading.Thread(target=__create_ws)
 t.start()
-
+def get_ip():
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.settimeout(0)
+        try:
+            # doesn't even have to be reachable
+            s.connect(('10.254.254.254', 1))
+            IP = s.getsockname()[0]
+        except Exception:
+            IP = '127.0.0.1'
+        finally:
+            s.close()
+        return IP
+    
 if not init:
     os.system('xdotool getactivewindow windowminimize')    
 root.mainloop()  

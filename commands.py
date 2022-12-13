@@ -10,6 +10,7 @@ from ghost import runGhost
 from snow import runSnowman, runSnow, runSnowflake
 from bells import runBells
 from general import runTree, runtest1, runInit, runCloak, runLoad
+from velctrl import runLeftTurn, runRightTurn
 
 
 
@@ -113,6 +114,12 @@ def run_command(command):
         os.system("vlc  " + file)
         os.system("sudo amixer cset numid=3 0%")
         
+    elif command == 'left#':
+        runLeftTurn()
+    
+    elif command == 'right#':
+        runRightTurn()
+        
 ######################################## VIDEOS ###################################################  
         
     elif command == 'grinch':
@@ -177,6 +184,9 @@ def run_command(command):
 
     elif command == "ball":
         runBall()
+        
+    elif command == "bell":
+        runBells()
 
     elif command == "ghost":
         runGhost()
@@ -186,3 +196,5 @@ def run_command(command):
 
     elif command == "pumpkin":
         runPumpkin()
+        
+    return command
