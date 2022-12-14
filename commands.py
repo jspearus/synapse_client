@@ -10,7 +10,7 @@ from ghost import runGhost
 from snow import runSnowman, runSnow, runSnowflake
 from bells import runBells
 from general import runTree, runtest1, runInit, runCloak, runLoad
-from velctrl import runLeftTurn, runRightTurn
+from velctrl import runLeftTurn, runRightTurn, runHazard
 
 
 
@@ -121,10 +121,10 @@ def run_command(command):
         runRightTurn()
         
     elif command == 'hleft#':
-        runGhost()
+        runHazard()
     
     elif command == 'hright#':
-        runPumpkin()
+        runHazard()
         
 ######################################## VIDEOS ###################################################  
         

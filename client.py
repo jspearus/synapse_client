@@ -171,6 +171,8 @@ def on_message(wsapp, message):
             on_closing()
             
         elif msg['message'] == "shutdown":
+            os.system("sudo amixer cset numid=3 100%")
+            time.sleep(.75)
             send_msg("Shutting Down Now...", 'web')
             file = "/home/pi/Music/012SystemImpared.mp3"
             os.system("pcmanfm --set-wallpaper /home/pi/Pictures/base.jpg")
@@ -296,11 +298,12 @@ def eventCTRLr():
     print("timer Running")
     while connected:
         today = datetime.now()
-        if today.hour > 12 and mode != "loud":
-            mode = "loud"
-            pre_command = run_command(mode)
+        # if today.hour > 12 and mode != "loud":
+        #     # mode = "loud"
+        #     # pre_command = run_command(mode)
+        #     pass
 
-        elif today.hour > 5 and today.hour < 13 and mode != "mute":
+        if today.hour > 5 and today.hour < 13 and mode != "mute":
             mode = "mute"
             pre_command = run_command(mode)
             
