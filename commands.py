@@ -17,7 +17,7 @@ from velctrl import runLeftTurn, runRightTurn
 
 def randomEvent():
     event = random.randint(7, size=(1))
-    print(event)
+    # print(event)
     if event == 0:
         run_command('snowman1')
     elif event == 1:
@@ -35,7 +35,7 @@ def randomEvent():
 
 def randomWhatsThis():
     event = random.randint(3, size=(1))
-    print(event)
+    # print(event)
     if event == 0:
         file = "/home/pi/Videos/wahtsthis1.mp4"
         runSnow()
@@ -51,7 +51,7 @@ def randomWhatsThis():
 
 def randomPolar():
     event = random.randint(2, size=(1))
-    print(event)
+    # print(event)
     if event == 0:
         file = "/home/pi/Videos/polar1.mp4"
         runSnow()
@@ -63,7 +63,7 @@ def randomPolar():
 
 def randomClaws():
     event = random.randint(6, size=(1))
-    print(event)
+    # print(event)
     if event == 0:
         file = "/home/pi/Videos/sandyclaws1.mp4"
         runSnow()
