@@ -120,6 +120,12 @@ def run_command(command):
     elif command == 'right#':
         runRightTurn()
         
+    elif command == 'hleft#':
+        runGhost()
+    
+    elif command == 'hright#':
+        runPumpkin()
+        
 ######################################## VIDEOS ###################################################  
         
     elif command == 'grinch':
