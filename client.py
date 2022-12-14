@@ -2,7 +2,7 @@ import websocket
 import json
 import threading
 import sys
-import time
+import time, pyautogui
 from datetime import datetime
 from datetime import timedelta
 import os, platform, serial, socket
@@ -42,7 +42,8 @@ root.configure(background='black')
 root.config(cursor="none")
 root.title("Holiday Remote")
 root.geometry('175x620+820+20')
-root.protocol("WM_DELETE_WINDOW", on_closing) 
+root.protocol("WM_DELETE_WINDOW", on_closing)
+root.iconify()
 
 if platform.system() == "Linux":
     xBee = serial.Serial("/dev/ttyS0", baudrate=9600, timeout=1.0)
@@ -169,9 +170,25 @@ def on_message(wsapp, message):
             send_msg("Disconnecting Now...", 'web')
             time.sleep(1)
             on_closing()
-            
+        
+        elif msg['message'] == "gui":
+            Videos.place_forget()
+            Icons.place_forget()
+            Settings.place_forget()
+            controlPanel.place(x=10, y=5)
+        
+        elif msg['message'] == "guioff":
+            Videos.place_forget()
+            Icons.place_forget()
+            Settings.place_forget()
+            controlPanel.place_forget()
+            root.iconify()
+
+                
         elif msg['message'] == "shutdown":
+            pyautogui.moveRel(10, 10)
             os.system("sudo amixer cset numid=3 100%")
+            pyautogui.moveRel(-10, -10)
             time.sleep(.75)
             send_msg("Shutting Down Now...", 'web')
             file = "/home/pi/Music/012SystemImpared.mp3"
@@ -185,7 +202,7 @@ def on_message(wsapp, message):
             wsapp.close()
             print("Closing..."
                   )
-            time.sleep(5)
+            time.sleep(2)
             os.system("sudo shutdown now")
             
         elif msg['message'] == "reboot":
@@ -200,7 +217,7 @@ def on_message(wsapp, message):
             time.sleep(1)
             wsapp.close()
             print("Closing...")
-            time.sleep(5)
+            time.sleep(2)
             os.system("sudo reboot now")
             
         else:
@@ -351,7 +368,7 @@ controlPanel = LabelFrame(
     width=150,
     height=600,
 )
-controlPanel.place(x=10, y=5)
+# controlPanel.place(x=10, y=5)
 
 VidBtn = Button(controlPanel,
                  text="Videos",
