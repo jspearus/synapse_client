@@ -19,7 +19,7 @@ connected = True
 init = False
 name = ''
 auto_mode = False
-mode = "none"
+mode = "Init"
 today = datetime.now()
 pre_time = today
 pre_command = "None"
@@ -82,6 +82,8 @@ def on_open(wsapp):
     global connected, init, auto_mode, mode, pre_command
     if not init:
         run_command('init')
+        pre_command = "init"
+        mode = "Init"
         init = True
         xBee.write(str.encode("Remote_Online\n"))
     print(f"Connected as: {name} @ {time.ctime()}")
@@ -147,6 +149,7 @@ def on_message(wsapp, message):
             mode = msg['message']
             send_msg(f"remmode:{str(mode)}", 'web')
             pre_command = run_command(msg['message'])
+
             
         elif(msg['message'] == 'init'):
             mode = msg['message']
@@ -160,14 +163,14 @@ def on_message(wsapp, message):
             time.sleep(.5)
             send_msg(f"remmode:{str(mode)}", msg['username'])
             time.sleep(.5)
-            send_msg(f"remcomm:{str(pre_command)}", 'web')
+            send_msg(f"remcomm:{str(pre_command)}", msg['username'])
             time.sleep(.5)
             send_msg(f"weather", 'web')
             time.sleep(.5)
-            send_msg(f"ip: {get_ip()}", 'web')
+            send_msg(f"ip: {get_ip()}", msg['username'])
         
         elif msg['message'] == "exit":
-            send_msg("Disconnecting Now...", 'web')
+            send_msg(f"remmode: Disconecting", 'web')
             time.sleep(1)
             on_closing()
         
@@ -190,7 +193,7 @@ def on_message(wsapp, message):
             os.system("sudo amixer cset numid=3 100%")
             pyautogui.moveRel(-10, -10)
             time.sleep(.75)
-            send_msg("Shutting Down Now...", 'web')
+            send_msg(f"remmode: Shutdown", 'web')
             file = "/home/pi/Music/012SystemImpared.mp3"
             os.system("pcmanfm --set-wallpaper /home/pi/Pictures/base.jpg")
             runLoad()
@@ -206,7 +209,7 @@ def on_message(wsapp, message):
             os.system("sudo shutdown now")
             
         elif msg['message'] == "reboot":
-            send_msg("Rebooting Now...", 'web')
+            send_msg(f"remmode: Shutdown", 'web')
             file = "/home/pi/Music/016RebootingCoreFunctions.mp3"
             os.system("pcmanfm --set-wallpaper /home/pi/Pictures/base.jpg")
             runLoad()
@@ -227,6 +230,7 @@ def on_message(wsapp, message):
             pre_command = run_command(msg['message'])
             if mode == "mute" and auto_mode == True:
                 os.system("sudo amixer cset numid=3 0%")
+        send_msg(f"remcomm:{str(pre_command)}", 'web')
 
 
 def __create_ws():
@@ -339,6 +343,7 @@ def eventCTRLr():
                 print(f"Next Event: {pre_time}")
                 pre_command = run_command('random')
                 send_msg(f"remnextevent:{str(pre_time.time())}", 'web')
+                send_msg(f"remcomm:{str(pre_command)}", 'web')
         time.sleep(20)
 
 ############################# USER INTERFACE ###################################
