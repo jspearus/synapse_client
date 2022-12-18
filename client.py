@@ -221,7 +221,12 @@ def on_message(wsapp, message):
             os.system("sudo reboot now")
             
         else:
+            
+            if mode == "mute" and auto_mode == True:
+                os.system("sudo amixer cset numid=3 100%")
             pre_command = run_command(msg['message'])
+            if mode == "mute" and auto_mode == True:
+                os.system("sudo amixer cset numid=3 0%")
 
 
 def __create_ws():
