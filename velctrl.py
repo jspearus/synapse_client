@@ -17,6 +17,7 @@ pass
 def right_turn():
     port.write(str.encode("clear#"))
     port.write(str.encode("show#"))
+    time.sleep(.1)
     port.write(str.encode("1,11,0,100,0#"))
     port.write(str.encode("1,13,0,100,0#"))
     port.write(str.encode("1,18,0,100,0#"))
@@ -53,6 +54,7 @@ def right_turn():
 def left_turn():
     port.write(str.encode("clear#"))
     port.write(str.encode("show#"))
+    time.sleep(.1)
     port.write(str.encode("2,11,0,100,0#"))
     port.write(str.encode("2,13,0,100,0#"))
     port.write(str.encode("2,18,0,100,0#"))
@@ -98,6 +100,7 @@ def hazard():
 def red_light():
     port.write(str.encode("clear#"))
     port.write(str.encode("show#"))
+    time.sleep(.1)
     port.write(str.encode("0,2,100,0,0#"))
     port.write(str.encode("0,3,100,0,0#"))
     port.write(str.encode("0,4,100,0,0#"))
