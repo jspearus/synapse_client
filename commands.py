@@ -10,7 +10,7 @@ from ghost import runGhost
 from snow import runSnowman, runSnow, runSnowflake
 from bells import runBells
 from general import runTree, runtest1, runInit, runCloak, runLoad
-from velctrl import runLeftTurn, runRightTurn, runHazard
+from velctrl import right_turn, left_turn, hazard
 
 
 
@@ -115,16 +115,16 @@ def run_command(command):
         os.system("sudo amixer cset numid=3 0%")
         
     elif command == 'left#':
-        runLeftTurn()
+        left_turn()
     
     elif command == 'right#':
-        runRightTurn()
+        right_turn()
         
     elif command == 'hleft#':
-        runHazard()
+        hazard()
     
     elif command == 'hright#':
-        runHazard()
+        hazard()
         
 ######################################## VIDEOS ###################################################  
         

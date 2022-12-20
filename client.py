@@ -322,6 +322,7 @@ def eventCTRLr():
     global pre_time, auto_mode
     global connected, pre_command
     print("timer Running")
+    time.sleep(2)
     while connected:
         today = datetime.now()
         # if today.hour > 12 and mode != "loud":

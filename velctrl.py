@@ -47,7 +47,7 @@ def right_turn():
     port.write(str.encode("1,53,100,0,0#"))
     port.write(str.encode("1,61,100,0,0#"))
     port.write(str.encode("show#"))
-    time.sleep(1)
+    time.sleep(.5)
     port.write(str.encode("clear#"))
     port.write(str.encode("show#"))
     
@@ -84,18 +84,13 @@ def left_turn():
     port.write(str.encode("2,53,100,0,0#"))
     port.write(str.encode("2,61,100,0,0#"))
     port.write(str.encode("show#"))
-    time.sleep(1)
+    time.sleep(.5)
     port.write(str.encode("clear#"))
     port.write(str.encode("show#"))
     
 def hazard():
     red_light()
     red_light()
-   
-
-    
-    
-    
 
 def red_light():
     port.write(str.encode("clear#"))
@@ -124,15 +119,4 @@ def red_light():
     port.write(str.encode("clear#"))
     port.write(str.encode("show#"))
     time.sleep(.25)
-    
-def runLeftTurn():
-    tProc = Process(target=left_turn, args=())
-    tProc.start()
-    
-def runRightTurn():
-    tProc = Process(target=right_turn, args=())
-    tProc.start()
 
-def runHazard():
-    hProc = Process(target=hazard, args=())
-    hProc.start()
