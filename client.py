@@ -196,7 +196,7 @@ def on_message(wsapp, message):
         elif msg['message'] == "snow" and weather == True:
             if msg['message'] != current_weather:
                 pyautogui.moveRel(10, 10)
-                pyautogui.moveRel(-10, -10)
+                pyautogui.moveRel(-20, -20)
                 time.sleep(.75)
                 os.system("pcmanfm --set-wallpaper /home/pi/Pictures/snow_wallpaper.jpg")
                 current_weather = msg['message']
@@ -206,7 +206,7 @@ def on_message(wsapp, message):
         elif msg['message'] == "rain" and weather == True:
             if msg['message'] != current_weather:
                 pyautogui.moveRel(10, 10)
-                pyautogui.moveRel(-10, -10)
+                pyautogui.moveRel(-20, -20)
                 time.sleep(.75)
                 os.system("pcmanfm --set-wallpaper /home/pi/Pictures/snow_wallpaper.jpg")
                 current_weather = msg['message']
@@ -216,7 +216,7 @@ def on_message(wsapp, message):
         elif msg['message'] == "clear" and weather == True:
             if msg['message'] != current_weather:
                 pyautogui.moveRel(10, 10)
-                pyautogui.moveRel(-10, -10)
+                pyautogui.moveRel(-20, -20)
                 time.sleep(.75)
                 os.system("pcmanfm --set-wallpaper /home/pi/Pictures/clear_wallpaper.jpg")
                 current_weather = msg['message']
@@ -226,7 +226,7 @@ def on_message(wsapp, message):
         elif msg['message'] == "cloud" and weather == True:
             if msg['message'] != current_weather:
                 pyautogui.moveRel(10, 10)
-                pyautogui.moveRel(-10, -10)
+                pyautogui.moveRel(-20, -20)
                 time.sleep(.75)
                 os.system("pcmanfm --set-wallpaper /home/pi/Pictures/cloud_wallpaper.jpg")
                 current_weather = msg['message']
@@ -236,7 +236,7 @@ def on_message(wsapp, message):
         elif msg['message'] == "fog" and weather == True:
             if msg['message'] != current_weather:
                 pyautogui.moveRel(10, 10)
-                pyautogui.moveRel(-10, -10)
+                pyautogui.moveRel(-20, -20)
                 time.sleep(.75)
                 os.system("pcmanfm --set-wallpaper /home/pi/Pictures/cloud_wallpaper.jpg")
                 pre_command = run_command(msg['message'])
@@ -247,7 +247,7 @@ def on_message(wsapp, message):
         elif msg['message'] == "shutdown":
             pyautogui.moveRel(10, 10)
             os.system("sudo amixer cset numid=3 100%")
-            pyautogui.moveRel(-10, -10)
+            pyautogui.moveRel(-20, -20)
             time.sleep(.75)
             send_msg(f"remmode: Shutdown", 'web')
             file = "/home/pi/Music/012SystemImpared.mp3"
