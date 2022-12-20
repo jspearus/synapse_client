@@ -19,10 +19,12 @@ connected = True
 init = False
 name = ''
 auto_mode = False
+weather = True
 mode = "Init"
 today = datetime.now()
 pre_time = today
 pre_command = "None"
+current_weather = "None"
 
 root = Tk()
 
@@ -87,7 +89,7 @@ def on_open(wsapp):
         init = True
         xBee.write(str.encode("Remote_Online\n"))
     print(f"Connected as: {name} @ {time.ctime()}")
-    os.system("pcmanfm --set-wallpaper /home/pi/Pictures/christmas.jpg")
+    os.system("pcmanfm --set-wallpaper /home/pi/Pictures/clear_wallpaper.jpg")
     inputThead = threading.Thread(target=useInput, args=())
     inputThead.setDaemon(True)
     inputThead.start()
@@ -99,6 +101,10 @@ def on_open(wsapp):
     eventThread = threading.Thread(target=eventCTRLr, args=())
     eventThread.setDaemon(True)
     eventThread.start()
+    
+    weatherThead = threading.Thread(target=check_weather, args=())
+    weatherThead.setDaemon(True)
+    weatherThead.start()
     
     send_msg(f"remauto:{str(auto_mode)}", 'web')
     time.sleep(.5)
@@ -127,7 +133,7 @@ def on_error(wsapp, error):
 
 def on_message(wsapp, message):
     global init, auto_mode, mode, connected, name, pre_command
-    global pre_time
+    global pre_time, weather, current_weather
     msg = json.loads(message)
     if msg['destination'] == name or msg['destination'] == "all":
         print(f"Rec: {message}")
@@ -186,6 +192,56 @@ def on_message(wsapp, message):
             Settings.place_forget()
             controlPanel.place_forget()
             root.iconify()
+        
+        elif msg['message'] == "snow" and weather == True:
+            if msg['message'] != current_weather:
+                pyautogui.moveRel(10, 10)
+                pyautogui.moveRel(-10, -10)
+                time.sleep(.75)
+                os.system("pcmanfm --set-wallpaper /home/pi/Pictures/snow_wallpaper.jpg")
+                current_weather = msg['message']
+                send_msg(f"UPDATE: {str(current_weather)}", 'web')
+            pre_command = run_command(msg['message'])
+        
+        elif msg['message'] == "rain" and weather == True:
+            if msg['message'] != current_weather:
+                pyautogui.moveRel(10, 10)
+                pyautogui.moveRel(-10, -10)
+                time.sleep(.75)
+                os.system("pcmanfm --set-wallpaper /home/pi/Pictures/snow_wallpaper.jpg")
+                current_weather = msg['message']
+                send_msg(f"UPDATE: {str(current_weather)}", 'web')
+                pre_command = pre_command = run_command(msg['message'])
+
+        elif msg['message'] == "clear" and weather == True:
+            if msg['message'] != current_weather:
+                pyautogui.moveRel(10, 10)
+                pyautogui.moveRel(-10, -10)
+                time.sleep(.75)
+                os.system("pcmanfm --set-wallpaper /home/pi/Pictures/clear_wallpaper.jpg")
+                current_weather = msg['message']
+                send_msg(f"UPDATE: {str(current_weather)}", 'web')
+                pre_command = run_command(msg['message'])
+
+        elif msg['message'] == "cloud" and weather == True:
+            if msg['message'] != current_weather:
+                pyautogui.moveRel(10, 10)
+                pyautogui.moveRel(-10, -10)
+                time.sleep(.75)
+                os.system("pcmanfm --set-wallpaper /home/pi/Pictures/cloud_wallpaper.jpg")
+                current_weather = msg['message']
+                pre_command = send_msg(f"UPDATE: {str(current_weather)}", 'web')
+                run_command(msg['message'])
+
+        elif msg['message'] == "fog" and weather == True:
+            if msg['message'] != current_weather:
+                pyautogui.moveRel(10, 10)
+                pyautogui.moveRel(-10, -10)
+                time.sleep(.75)
+                os.system("pcmanfm --set-wallpaper /home/pi/Pictures/cloud_wallpaper.jpg")
+                pre_command = run_command(msg['message'])
+                send_msg(f"UPDATE: {str(current_weather)}", 'web')
+                current_weather = msg['message']
 
                 
         elif msg['message'] == "shutdown":
@@ -346,6 +402,16 @@ def eventCTRLr():
                 send_msg(f"remnextevent:{str(pre_time.time())}", 'web')
                 send_msg(f"remcomm:{str(pre_command)}", 'web')
         time.sleep(20)
+        
+#########################################################################
+def check_weather():    # runs in thread
+    global connected, name, weather
+    time.sleep(15)
+    while connected:
+        if weather:
+            send_msg("weather", name)
+        time.sleep(600)
+#####################################################################
 
 ############################# USER INTERFACE ###################################
 def fromUI(data):

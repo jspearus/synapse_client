@@ -7,7 +7,7 @@ from wreath import runWreath
 from ball import runBall
 from pumpkin import runPumpkin
 from ghost import runGhost
-from snow import runSnowman, runSnow, runSnowflake
+from snow import runSnowman, runSnow, runSnowflake, runPolar
 from bells import runBells
 from general import runTree, runtest1, runInit, runCloak, runLoad
 from velctrl import right_turn, left_turn, hazard
@@ -144,9 +144,7 @@ def run_command(command):
         os.system("vlc  " + file)
         
     elif command == 'snow':
-        file = "/home/pi/Videos/snowing.mp4"
         runSnow()
-        os.system("vlc  " + file)
     
     elif command == 'vader':
         file = "/home/pi/Videos/CarolofTheBellsVader.mp4"
@@ -160,16 +158,12 @@ def run_command(command):
     
     elif command == 'polar':
         file = "/home/pi/Videos/polar1.mp4"
-        runSnowflake()
-        runSnow()
-        runSnow()
+        runPolar()
         os.system("vlc  " + file)
         
     elif command == 'polar2':
         file = "/home/pi/Videos/polar2.mp4"
-        runSnow()
-        runSnowflake()
-        runSnow()
+        runPolar()
         os.system("vlc  " + file)
         
     elif command == 'what':

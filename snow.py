@@ -164,3 +164,13 @@ def snowflake():
 def runSnowflake():
     p = Process(target=snowflake, args=())
     p.start()
+    
+def polar():
+    snowflake()
+    snow()
+    snow()
+    snow()
+
+def runPolar():
+    p = Process(target=polar, args=())
+    p.start()
