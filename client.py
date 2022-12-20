@@ -83,13 +83,13 @@ def serialRead():
 def on_open(wsapp):
     global connected, init, auto_mode, mode, pre_command
     if not init:
+        os.system("pcmanfm --set-wallpaper /home/pi/Pictures/clear_wallpaper.jpg")
         run_command('init')
         pre_command = "init"
         mode = "Init"
         init = True
         xBee.write(str.encode("Remote_Online\n"))
     print(f"Connected as: {name} @ {time.ctime()}")
-    os.system("pcmanfm --set-wallpaper /home/pi/Pictures/clear_wallpaper.jpg")
     inputThead = threading.Thread(target=useInput, args=())
     inputThead.setDaemon(True)
     inputThead.start()
