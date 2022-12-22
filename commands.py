@@ -1,5 +1,5 @@
 
-import os, time
+import os, time, pyautogui
 from numpy import random
 
 from grinch import runGrinch
@@ -125,6 +125,10 @@ def run_command(command):
     
     elif command == 'hright#':
         hazard()
+    
+    elif command == 'wake':
+        pyautogui.moveTo(100, 10)
+        pyautogui.moveRel(1000, 100)
         
 ######################################## VIDEOS ###################################################  
         
