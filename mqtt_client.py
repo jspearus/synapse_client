@@ -15,7 +15,7 @@ name = ''
 mOffHour, mOffMin = 22, 00
 hour, minute = 16, 30
 sunSet2_Offset = 20
-monitor_status = False
+monitor_status = True
 lights_status = False
 trees_status = False
 autoOn = True
@@ -27,34 +27,39 @@ sunset_time_2 = current_datetime.replace(hour=hour, minute=minute+sunSet2_Offset
 MonOff_time = current_datetime.replace(hour=mOffHour, minute=mOffMin)
 
 def main():
-    os.system("video-wallpaper.sh --start ~/Videos/snow.mp4")
+    # os.system("video-wallpaper.sh --start ~/Videos/snow.mp4")
     print(f"Connected as: {name} @ {time.ctime()}")
-    # time.sleep(2)
-    # inputThead = threading.Thread(target=useInput, args=())
+    time.sleep(2)
+    inputThead = threading.Thread(target=useInput, args=())
     # inputThead.setDaemon(True)
-    # inputThead.start()
-    # time.sleep(3)
+    inputThead.start()
+    time.sleep(3)
     #todo uncomment to get weather updates
     # weatherThead = threading.Thread(target=check_weather, args=())
     # weatherThead.setDaemon(True)
     # weatherThead.start()
     # time.sleep(3)
-    sunsetThead = threading.Thread(target=check_new_day, args=())
-    sunsetThead.setDaemon(True)
-    sunsetThead.start()
-    time.sleep(3)
+    # sunsetThead = threading.Thread(target=check_new_day, args=())
+    # sunsetThead.setDaemon(True)
+    # sunsetThead.start()
+    # time.sleep(3)
     monitorThead = threading.Thread(target=monitor_control, args=())
-    monitorThead.setDaemon(True)
+    # monitorThead.setDaemon(True)
     monitorThead.start()
+    runPowerOn()
+    time.sleep(10)
     runTreesOn()
-    
+    time.sleep(2)
+    runLightsOn()
+ 
     #########################################################################
 
 def check_weather():
     global connected
-    time.sleep(15)
+    time.sleep(1)
     while connected:
-        time.sleep(120)
+        print("TEst")
+        time.sleep(1)
  #####################################################################
 def check_new_day(): #runs in thread
     global connected, current_day
@@ -70,32 +75,32 @@ def monitor_control(): # runs in thread
     global monitor_status, autoOn, lights_status, trees_status
     global connected, sunset_time, MonOff_time, sunset_time_2
     global hour, minute
-    time.sleep(10) 
     print(f"Monitor Control {connected}")
+    time.sleep(10) 
     while connected:
         print(f"Running {connected}")
         current_time = datetime.now()
         sunset_time = sunset_time.replace(day=current_time.day)
         sunset_time_2 = sunset_time_2.replace(day=current_time.day)
         MonOff_time = MonOff_time.replace(day=current_time.day)
-        if current_time > MonOff_time and monitor_status == True and autoOn == True:
-            runPowerOff()
-            runLightsOff()
-            runTreesOff()
-            monitor_status = False
-            lights_status = False
-            trees_status = False
+        # if current_time > MonOff_time and monitor_status == True and autoOn == True:
+        #     runPowerOff()
+        #     runLightsOff()
+        #     runTreesOff()
+        #     monitor_status = False
+        #     lights_status = False
+        #     trees_status = False
             
-        elif current_time > sunset_time and current_time < MonOff_time and monitor_status == False and autoOn == True:
-            runPowerOn()
-            monitor_status = True
+        # elif current_time > sunset_time and current_time < MonOff_time and monitor_status == False and autoOn == True:
+        #     runPowerOn()
+        #     monitor_status = True
         
-        elif current_time > sunset_time_2 and current_time < MonOff_time and lights_status == False and autoOn == True:
-            runLightsOn()
-            lights_status = True
-            time.sleep(10)
-            runTreesOn()
-            trees_status = True
+        # elif current_time > sunset_time_2 and current_time < MonOff_time and lights_status == False and autoOn == True:
+        #     runLightsOn()
+        #     lights_status = True
+        #     time.sleep(10)
+        #     runTreesOn()
+        #     trees_status = True
         
         print(f"Sunset time: {sunset_time}, MonOff time: {MonOff_time}")
         print(f"Current time: {current_time}, Sunset time_2: {sunset_time_2}")
@@ -106,7 +111,8 @@ def monitor_control(): # runs in thread
 def useInput():
     global connected
     time.sleep(2)
-    dest = "" 
+    dest = ""
+    print(f"Input Control {connected}")
     while connected:
         dest = input("enter DEST (q to close): ")
         if dest == 'q':
@@ -115,6 +121,11 @@ def useInput():
             print("Disconecting...")
             time.sleep(1)
             print("Closing...")
+            runLightsOff()
+            time.sleep(2)
+            runTreesOff()
+            time.sleep(2)
+            runPowerOff()
         else:
             smsg = input("enter msg (q to close): ")
             if smsg == 'q':
