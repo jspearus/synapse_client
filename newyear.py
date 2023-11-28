@@ -50,7 +50,13 @@ def fire_works():
     for i in range(7):
         port.write(str.encode(f"1, {i+106}, 100, 100,100#"))
     port.write(str.encode("show#"))
+    for i in range(37, 0 , -1):
+        port.write(str.encode(f"0, {i}, 250, 0,0#"))
+        port.write(str.encode(f"0, {i+63}, 0, 250,0#"))
+        port.write(str.encode("show#"))
+        
     time.sleep(1)
     port.write(str.encode("clear#"))
     port.write(str.encode("show#"))
+    # 0 - 36 first col, 37 - 66 2nd col 67 - 99 last col
     return True
