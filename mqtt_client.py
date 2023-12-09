@@ -57,9 +57,9 @@ def on_message(client, userdata, msg):
     elif "All On" in str(msg.payload).strip():
         runPowerOn()
         time.sleep(5)
-        runLightsOn()
-        time.sleep(5)
         runTreesOn()
+        time.sleep(5)
+        runLightsOn()
         client.publish("caroler_feedback", payload="All On", qos=1, retain=False)
     
         

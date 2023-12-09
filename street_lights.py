@@ -12,17 +12,17 @@ elif platform.system() == "Windows":
 pass
 
 
-def power_on():
-    port.write(str.encode("sOn#"))
+def lights_on():
+    port.write(str.encode("sOnf#"))
     
-def power_on_quick():
+def lights_on_quick():
     port.write(str.encode("sOnq#"))
     
-def power_off():
-    port.write(str.encode("sOff#"))
+def lights_off():
+    port.write(str.encode("sOfff#"))
     
 def trees_on():
-    port.write(str.encode("tOn#"))
+    port.write(str.encode("tOnq#"))
     
 def trees_on_quick():
     port.write(str.encode("tOnq#"))
@@ -33,15 +33,15 @@ def trees_off():
       
 
 def runLightsOn():
-    tProc = Process(target=power_on, args=())
+    tProc = Process(target=lights_on, args=())
     tProc.start()
     
 def runLightsOnQuick():
-    tProc = Process(target=power_on_quick, args=())
+    tProc = Process(target=lights_on_quick, args=())
     tProc.start()  
 
 def runLightsOff():
-    tProc = Process(target=power_off, args=())
+    tProc = Process(target=lights_off, args=())
     tProc.start()
     
 def runTreesOn():
