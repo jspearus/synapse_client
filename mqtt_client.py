@@ -51,6 +51,14 @@ def on_message(client, userdata, msg):
     if "tree off" in str(msg.payload).strip():
         run_command("moff")
         client.publish("LvTree_feedback", payload="Tree Off", qos=1, retain=False)
+        
+    elif "tree on mthanks" in str(msg.payload).strip():
+        run_command("mthanks")
+        client.publish("LvTree_feedback", payload="Tree On", qos=1, retain=False)
+        
+    elif "tree on thanks" in str(msg.payload).strip():
+        run_command("thanks")
+        client.publish("LvTree_feedback", payload="Tree On", qos=1, retain=False)
     
     elif "tree on mn" in str(msg.payload).strip():
         run_command("mnew")
