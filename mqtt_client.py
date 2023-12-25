@@ -217,6 +217,9 @@ def useInput():
             
         elif dest == 'on':
             run_command("advent")
+            
+        elif dest == 'onNew':
+            run_command("new")
         
         elif dest == 'off':
             run_command("moff")
