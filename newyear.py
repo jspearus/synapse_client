@@ -16,15 +16,14 @@ pass
 
 def newYear():
     for i in range(50):
-        port.write(str.encode(f"1,{i},0,200,0#"))
-        port.write(str.encode("show1#"))
-        time.sleep(.02)
-    for i in range(100, -1, -1):
+        port.write(str.encode(f"1,{i},100,100,100#"))
+        port.write(str.encode("show#"))
+        time.sleep(.07)
+    for i in range(100):
         port.write(str.encode(f"0,{i},100,100,100#"))
         port.write(str.encode("show#"))
         time.sleep(.07)
-    day = int(day.strftime("%d")) * 2
-    for i in range(0, (day*2), 2):
+    for i in range(-1, 100, 2):
         port.write(str.encode(f"2,{i},100,0,0#"))
         port.write(str.encode("show2#"))
         time.sleep(.1)
