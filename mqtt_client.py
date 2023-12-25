@@ -63,17 +63,17 @@ def on_message(client, userdata, msg):
     elif "tree on mn" in str(msg.payload).strip():
         run_command("mnew")
         client.publish("LvTree_feedback", payload="Tree On", qos=1, retain=False)
-
-    elif "tree on m" in str(msg.payload).strip():
-        run_command("madvent")
-        client.publish("LvTree_feedback", payload="Tree On", qos=1, retain=False)
         
     elif "tree on new" in str(msg.payload).strip():
         run_command("new")
         client.publish("LvTree_feedback", payload="Tree On", qos=1, retain=False)
         
+    elif "tree on m" in str(msg.payload).strip():
+        check_new_day('m')
+        client.publish("LvTree_feedback", payload="Tree On", qos=1, retain=False)
+        
     elif "tree on" in str(msg.payload).strip():
-        run_command("advent")
+        check_new_day('d')
         client.publish("LvTree_feedback", payload="Tree On", qos=1, retain=False)
         
     elif "village on q" in str(msg.payload).strip():
@@ -166,17 +166,31 @@ def check_weather():    # runs in thread
 #####################################################################
 
 
-def check_new_day():  # runs in thread
-    global connected, name
-    global  current_day
-    time.sleep(5)
-    print("New Day Updater Running...")
-    while connected:
-        if current_day.day != datetime.now().day:
-            current_day = datetime.now()
-            if tree_status:
-                run_command("advent")
-        time.sleep(90)
+def check_new_day(mode):  # runs in thread
+    cur_day = datetime.now()
+    print(f"Current Day: {cur_day.day}")
+    print(f"Current Month: {cur_day.month}")
+    if mode == 'm':
+        if cur_day.month == 11:
+            print("Mode: M Thanks")
+            run_command('mthanks')
+        elif cur_day.month == 12 and cur_day.day < 26:
+            print("Mode: M Advent")
+            run_command('madvent')
+        elif (cur_day.month == 12 and cur_day.day > 25) or cur_day.month == 1:
+            print("Mode: M New Years")
+            run_command('mnew')    
+            
+    elif mode == 'd':
+        if cur_day.month == 11:
+            print("Mode: D Thanks")
+            run_command('thanks')
+        elif cur_day.month == 12 and cur_day.day < 26:
+            print("Mode: D Advent")
+            run_command('advent')
+        elif (cur_day.month == 12 and cur_day.day > 25) or cur_day.month == 1:
+            print("Mode: D New Years")
+            run_command('new') 
         
 ########################################################################
 
