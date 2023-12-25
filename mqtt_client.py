@@ -56,12 +56,12 @@ def on_message(client, userdata, msg):
         run_command("madvent")
         client.publish("LvTree_feedback", payload="Tree On", qos=1, retain=False)
         
-    elif "tree on" in str(msg.payload).strip():
-        run_command("advent")
-        client.publish("LvTree_feedback", payload="Tree On", qos=1, retain=False)
-        
     elif "tree on new" in str(msg.payload).strip():
         run_command("new")
+        client.publish("LvTree_feedback", payload="Tree On", qos=1, retain=False)
+        
+    elif "tree on" in str(msg.payload).strip():
+        run_command("advent")
         client.publish("LvTree_feedback", payload="Tree On", qos=1, retain=False)
         
     elif "village on q" in str(msg.payload).strip():
