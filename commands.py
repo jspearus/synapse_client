@@ -148,9 +148,16 @@ def runCommand(command):
             print(f"{command}: {comFree}")
             
     elif command == 'fire' and comFree == True:
+        # todo still needs to check to see if the tree is turned and what mode it's in ie. morning or day!
+        cur_day = datetime.now()
         comFree = False
         temp =fire_works()
-        comFree = advent()
+        if cur_day.month == 11:
+            comFree = thanksGiving()
+        elif cur_day.month == 12 and cur_day.day < 26:
+            comFree = advent()
+        elif (cur_day.month == 12 and cur_day.day > 25) or cur_day.month == 1:
+            comFree = newYear()
         if debug:
             print(f"{command}: {comFree}")
         
