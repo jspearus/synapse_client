@@ -74,3 +74,6 @@ def testTop():
     port.write(str.encode("clear1#"))
     port.write(str.encode("show1#"))
     return True
+
+if __name__ == "__main__":
+    test1()

@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import socket
 import json
 import threading
@@ -10,6 +12,7 @@ import os
 import json
 from pathlib import Path
 import platform
+# from screen import refreshScreen
 from colorama import Fore, Back, Style
 import paho.mqtt.client as mqtt
 
@@ -135,9 +138,9 @@ def main():
     client.username_pw_set("mqtt-user", "yqhevr")
     client.connect("192.168.1.155", 1883, 60)
     
-    inputThead = threading.Thread(target=useInput, args=())
-    # inputThead.setDaemon(True)
-    inputThead.start()
+    # inputThead = threading.Thread(target=useInput, args=())
+    # # inputThead.setDaemon(True)
+    # inputThead.start()
     
     # newDayThead = threading.Thread(target=check_new_day, args=())
     # # newDayThead.setDaemon(True)
@@ -171,7 +174,7 @@ def check_new_day(mode):  # runs in thread
     print(f"Current Day: {cur_day.day}")
     print(f"Current Month: {cur_day.month}")
     if mode == 'm':
-        if cur_day.month == 11:
+        if cur_day.month == 10:
             print("Mode: M Thanks")
             run_command('mthanks')
         elif cur_day.month == 12 and cur_day.day < 26:
@@ -182,7 +185,7 @@ def check_new_day(mode):  # runs in thread
             run_command('mnew')    
             
     elif mode == 'd':
-        if cur_day.month == 11:
+        if cur_day.month == 10:
             print("Mode: D Thanks")
             run_command('thanks')
         elif cur_day.month == 12 and cur_day.day < 26:
@@ -283,4 +286,5 @@ def get_ip():
     
 
 if __name__ == "__main__":
+    # refreshScreen()
     main()
