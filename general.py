@@ -6,7 +6,7 @@ import time
 import platform
 import serial
 from serial.serialutil import Timeout
-port = serial.Serial("/dev/ttyAMA0", baudrate=115200, timeout=3.0)
+
 if platform.system() == "Linux":
     port = serial.Serial("/dev/ttyAMA0", baudrate=115200, timeout=3.0)
 elif platform.system() == "Windows":
@@ -43,14 +43,15 @@ def test1():
     time.sleep(5)
     port.write(str.encode("clear#"))
     port.write(str.encode("show#"))
+    testTop()
     print("done")
     return True
 
 
 def treeOff():
     for i in range(114):
-        port.write(str.encode(f"1,{i},200,0,0#"))
-        port.write(str.encode("show1#"))
+        port.write(str.encode(f"5,{i},200,0,0#"))
+        port.write(str.encode("show5#"))
         time.sleep(.07)
     for i in range(100, -1, -1):
         port.write(str.encode(f"0,{i},0,0,0#"))
@@ -58,30 +59,30 @@ def treeOff():
         time.sleep(.02)
    
     for i in range(114):
-        port.write(str.encode(f"1,{i},0,0,0#"))
-        port.write(str.encode("show1#"))
+        port.write(str.encode(f"5,{i},0,0,0#"))
+        port.write(str.encode("show5#"))
         time.sleep(.07)
     return True
 
 
 def testTop():
     for i in range(114):
-        port.write(str.encode(f"1,{i},100,0,0#"))
-        port.write(str.encode("show1#"))
+        port.write(str.encode(f"5,{i},100,0,0#"))
+        port.write(str.encode("show5#"))
         time.sleep(.01)
     time.sleep(5)
     for i in range(114):
-        port.write(str.encode(f"1,{i},0,100,0#"))
-        port.write(str.encode("show1#"))
+        port.write(str.encode(f"5,{i},0,100,0#"))
+        port.write(str.encode("show5#"))
         time.sleep(.01)
     time.sleep(5)
     for i in range(114):
-        port.write(str.encode(f"1,{i},0,0,100#"))
-        port.write(str.encode("show1#"))
+        port.write(str.encode(f"5,{i},0,0,100#"))
+        port.write(str.encode("show5#"))
         time.sleep(.01)
     time.sleep(5)
-    port.write(str.encode("clear1#"))
-    port.write(str.encode("show1#"))
+    port.write(str.encode("clear5#"))
+    port.write(str.encode("show5#"))
     return True
 
 if __name__ == "__main__":
