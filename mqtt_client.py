@@ -17,6 +17,8 @@ from colorama import Fore, Back, Style
 import paho.mqtt.client as mqtt
 
 from commands import run_command
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 connected = True
 name = ''
@@ -131,7 +133,7 @@ def main():
     print(f"Connected as: {name} @ {time.ctime()}")
     # os.system("video-wallpaper.sh --start ~/Videos/snow.mp4")
     print(f"Connected as: {name} @ {time.ctime()}")
-    client = mqtt.Client()
+    client = mqtt.Client(protocol=mqtt.MQTTv311)  # Optionally set the protocol
     client.on_connect = on_connect
     client.on_message = on_message
 

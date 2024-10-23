@@ -12,7 +12,7 @@ RST = None
 
 # Create the SSD1306 OLED class.
 # The first two parameters are the width and height. The third is the I2C interface.
-oled = Adafruit_SSD1306.SSD1306_128_32(rst=RST, i2c_address=0x3C)
+oled = Adafruit_SSD1306.SSD1306_128_64(rst=RST, i2c_address=0x3C)
 # Initialize library.
 oled.begin()
 
@@ -54,13 +54,13 @@ def refreshScreen():
 
     # Write two lines of text.
 
-    draw.text((x, top),       "     lvrm TREE",  font=font, fill=255)
+    draw.text((x, top),       "     mini TREE",  font=font, fill=255)
     # draw.text((x, top+12),     str(CPU), font=font, fill=255)
     # draw.text((x, top+20),    str(MemUsage),  font=font, fill=255)
-    draw.text((x, top+12),"IP: " + str(IP),  font=font, fill=255)
-    # draw.text((x, top+39),    "PORT: 8080",  font=font, fill=255)
+    draw.text((x, top+29),"IP: " + str(IP),  font=font, fill=255)
+    draw.text((x, top+39),    "PORT: 8080",  font=font, fill=255)
     # Display image.
     oled.image(image)
     oled.display()
-if __name__ == "__main__":  
-    refreshScreen()
+
+refreshScreen()

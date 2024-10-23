@@ -7,7 +7,7 @@ import serial
 from serial.serialutil import Timeout
 
 if platform.system() == "Linux":
-    port = serial.Serial("/dev/ttyACM0", baudrate=115200, timeout=3.0)
+    port = serial.Serial("/dev/ttyAMA0", baudrate=115200, timeout=3.0)
 elif platform.system() == "Windows":
     port = serial.Serial("COM15", baudrate=115200, timeout=3.0)
 else:
@@ -54,3 +54,8 @@ def village_off_quick():
         out_ctrl(house, "off")
         time.sleep(.5)
     return True   
+
+if __name__ == "__main__":
+    village_on_quick()
+    time.sleep(5)
+    village_off_quick()
