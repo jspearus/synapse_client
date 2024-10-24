@@ -20,7 +20,7 @@ def thanksGiving():
         port.write(str.encode("show5#"))
         time.sleep(.07)
     for i in range(100):
-        port.write(str.encode(f"0,{i},205,102,14#"))
+        port.write(str.encode(f"0,{i},255,255,0#"))
         port.write(str.encode("show#"))
         time.sleep(.07)
     for i in range(-1, 100, 2):
@@ -71,3 +71,12 @@ def morningThanksGiving():
         port.write(str.encode("show5#"))
         time.sleep(.07)
     return True
+
+if __name__ == "__main__":
+    thanksGiving()
+    time.sleep(10)
+    port.write(str.encode("clear#"))
+    port.write(str.encode("show#"))
+    time.sleep(1)
+    port.write(str.encode("clear5#"))
+    port.write(str.encode("show5#"))

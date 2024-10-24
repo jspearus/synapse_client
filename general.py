@@ -17,27 +17,27 @@ pass
 def test1():
     print("starting")
     for i in range(100):
-        port.write(str.encode(f"1,{i},100,0,0#"))
+        port.write(str.encode(f"1,{i},100,100,100#"))
         port.write(str.encode("show1#"))
         time.sleep(.01)
     time.sleep(1)
     for i in range(100):
-        port.write(str.encode(f"2,{i},0,100,0#"))
+        port.write(str.encode(f"2,{i},100,100,100#"))
         port.write(str.encode("show2#"))
         time.sleep(.01)
     time.sleep(1)
     for i in range(100):
-        port.write(str.encode(f"3,{i},0,0,100#"))
+        port.write(str.encode(f"3,{i},100,100,100#"))
         port.write(str.encode("show3#"))
         time.sleep(.01)
     time.sleep(1)
     for i in range(100):
-        port.write(str.encode(f"4,{i},50,50,50#"))
+        port.write(str.encode(f"4,{i},100,100,100#"))
         port.write(str.encode("show4#"))
         time.sleep(.01)
     time.sleep(1)
     for i in range(100):
-        port.write(str.encode(f"5,{i},100,100,0#"))
+        port.write(str.encode(f"5,{i},100,100,100#"))
         port.write(str.encode("show5#"))
         time.sleep(.01)
     time.sleep(5)
