@@ -4,3 +4,4 @@ paho-mqtt
 Adafruit-SSD1306
 pillow
 smbus2
+colorama
