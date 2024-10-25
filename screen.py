@@ -54,7 +54,7 @@ def refreshScreen():
 
     # Write two lines of text.
 
-    draw.text((x, top),       "     mini TREE",  font=font, fill=255)
+    draw.text((x, top),       "     LVM TREE",  font=font, fill=255)
     # draw.text((x, top+12),     str(CPU), font=font, fill=255)
     # draw.text((x, top+20),    str(MemUsage),  font=font, fill=255)
     draw.text((x, top+29),"IP: " + str(IP),  font=font, fill=255)
