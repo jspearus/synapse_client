@@ -17,6 +17,7 @@ from colorama import Fore, Back, Style
 import paho.mqtt.client as mqtt
 
 from commands import run_command
+from screen import refreshScreen
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
@@ -288,5 +289,5 @@ def get_ip():
     
 
 if __name__ == "__main__":
-    # refreshScreen()
+    refreshScreen()
     main()
