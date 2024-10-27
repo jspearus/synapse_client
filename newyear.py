@@ -101,12 +101,14 @@ def fire_works():
         port.write(str.encode(f"0, {i}, 250, 0,0#"))
         port.write(str.encode(f"0, {i+63}, 250, 0,0#"))
         port.write(str.encode("show#"))
+        time.sleep(.4)
         
     time.sleep(1)
-    port.write(str.encode("clear#"))
-    port.write(str.encode("show#"))
     port.write(str.encode("clear5#"))
     port.write(str.encode("show5#"))
+    time.sleep(.4)
+    port.write(str.encode("clear#"))
+    port.write(str.encode("show#"))
     print("done")
     # 0 - 36 first col, 37 - 66 2nd col 67 - 99 last col
     return True
