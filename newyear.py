@@ -101,7 +101,7 @@ def fire_works():
         port.write(str.encode(f"0, {i}, 250, 0,0#"))
         port.write(str.encode(f"0, {i+63}, 250, 0,0#"))
         port.write(str.encode("show#"))
-        time.sleep(.01)
+        time.sleep(.001)
         
     time.sleep(1)
     port.write(str.encode("clear5#"))
