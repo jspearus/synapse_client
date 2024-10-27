@@ -99,13 +99,16 @@ def fire_works():
     port.write(str.encode("show5#"))
     for i in range(37, 0 , -1):
         port.write(str.encode(f"0, {i}, 250, 0,0#"))
-        port.write(str.encode(f"0, {i+63}, 0, 250,0#"))
+        port.write(str.encode(f"0, {i+63}, 250, 0,0#"))
         port.write(str.encode("show#"))
         
     time.sleep(1)
     port.write(str.encode("clear#"))
-    port.write(str.encode("clear5#"))
     port.write(str.encode("show#"))
+    port.write(str.encode("clear5#"))
     port.write(str.encode("show5#"))
     # 0 - 36 first col, 37 - 66 2nd col 67 - 99 last col
     return True
+
+if __name__ == "__main__":
+    fire_works()
