@@ -107,6 +107,7 @@ def fire_works():
     port.write(str.encode("show#"))
     port.write(str.encode("clear5#"))
     port.write(str.encode("show5#"))
+    print("done")
     # 0 - 36 first col, 37 - 66 2nd col 67 - 99 last col
     return True
 
