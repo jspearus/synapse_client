@@ -177,7 +177,7 @@ def check_new_day(mode):  # runs in thread
     print(f"Current Day: {cur_day.day}")
     print(f"Current Month: {cur_day.month}")
     if mode == 'm':
-        if cur_day.month == 10:
+        if cur_day.month == 11:
             print("Mode: M Thanks")
             run_command('mthanks')
         elif cur_day.month == 12 and cur_day.day < 26:
@@ -188,7 +188,7 @@ def check_new_day(mode):  # runs in thread
             run_command('mnew')    
             
     elif mode == 'd':
-        if cur_day.month == 10:
+        if cur_day.month == 11:
             print("Mode: D Thanks")
             run_command('thanks')
         elif cur_day.month == 12 and cur_day.day < 26:
