@@ -10,6 +10,7 @@ import paho.mqtt.client as mqtt
 from general import runPowerOn, runPowerOff
 from street_lights import runLightsOn, runLightsOff, runLightsOnQuick
 from street_lights import runTreesOn, runTreesOnQuick, runTreesOff
+from video import runVideoOn, runVideoOff
 
 connected = True
 name = ''
@@ -40,14 +41,17 @@ def on_message(client, userdata, msg):
     print(msg.topic+" "+str(msg.payload).strip())
     if "screen off" in str(msg.payload).strip():
         runPowerOff()
+        runVideoOff()
         client.publish("caroler_feedback", payload="Monitor Off", qos=1, retain=False)
 
     elif "screen" in str(msg.payload).strip():
         runPowerOn()
+        runVideoOn()
         client.publish("caroler_feedback", payload="Monitor On", qos=1, retain=False)
         
     elif "All On q" in str(msg.payload).strip():
         runPowerOn()
+        runVideoOn()
         time.sleep(5)
         runLightsOnQuick()
         time.sleep(5)
@@ -56,6 +60,7 @@ def on_message(client, userdata, msg):
         
     elif "All On" in str(msg.payload).strip():
         runPowerOn()
+        runVideoOn()
         time.sleep(5)
         runTreesOn()
         time.sleep(5)
@@ -68,6 +73,7 @@ def on_message(client, userdata, msg):
         time.sleep(5)
         runTreesOff()
         time.sleep(5)
+        runVideoOff()
         runPowerOff()
         client.publish("caroler_feedback", payload="All On", qos=1, retain=False)
         
@@ -76,6 +82,7 @@ def on_message(client, userdata, msg):
 
 def main():
     global connected
+    runVideoOn()
     # os.system("video-wallpaper.sh --start ~/Videos/snow.mp4")
     print(f"Connected as: {name} @ {time.ctime()}")
     client = mqtt.Client()

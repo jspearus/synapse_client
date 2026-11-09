@@ -1,34 +1,42 @@
 
 from multiprocessing import Process
+import logging
 import platform, time
 import serial
-from serial.serialutil import Timeout
 
-port = serial.Serial("/dev/ttyACM1", baudrate=115200, timeout=3.0)
-if platform.system() == "Linux":
-    port = serial.Serial("/dev/ttyACM1", baudrate=115200, timeout=3.0)
-elif platform.system() == "Windows":
-    port = serial.Serial("COM15", baudrate=115200, timeout=3.0)
-pass
+
+def _send_command(command):
+    if platform.system() == "Linux":
+        port_name = "/dev/ttyACM1"
+    elif platform.system() == "Windows":
+        port_name = "COM15"
+    else:
+        raise RuntimeError(f"Unsupported platform: {platform.system()}")
+
+    try:
+        with serial.Serial(port_name, baudrate=115200, timeout=3.0) as port:
+            port.write(command.encode())
+    except serial.SerialException as exc:
+        logging.error("Could not send serial command %r through %s: %s", command, port_name, exc)
 
 
 def lights_on():
-    port.write(str.encode("sOnf#"))
+    _send_command("sOnf#")
     
 def lights_on_quick():
-    port.write(str.encode("sOnq#"))
+    _send_command("sOnq#")
     
 def lights_off():
-    port.write(str.encode("sOfff#"))
+    _send_command("sOfff#")
     
 def trees_on():
-    port.write(str.encode("tOnq#"))
+    _send_command("tOnq#")
     
 def trees_on_quick():
-    port.write(str.encode("tOnq#"))
+    _send_command("tOnq#")
     
 def trees_off():
-    port.write(str.encode("tOff#"))
+    _send_command("tOff#")
     
       
 
@@ -55,4 +63,3 @@ def runTreesOnQuick():
 def runTreesOff():
     tProc = Process(target=trees_off, args=())
     tProc.start()
-
